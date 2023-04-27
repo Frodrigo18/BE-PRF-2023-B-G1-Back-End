@@ -19,3 +19,6 @@ yarn-error.log*
 # Cualquier otra cosa que desee ignorar
 .idea
 .vscode
+
+#env
+.env
