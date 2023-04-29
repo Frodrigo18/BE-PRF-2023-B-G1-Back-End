@@ -8,4 +8,4 @@ RUN npm install
 
 COPY . .
 
-CMD node startup.js && npm start
+CMD node mongo/startup.js && npm start
