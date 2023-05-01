@@ -1,4 +1,9 @@
-const mongoclient = require("mongodb").MongoClient;
+import dotenv from "dotenv";
+import mongodb from "mongodb";
+
+dotenv.config();
+
+const mongoclient = mongodb.MongoClient;
 const uri = process.env.MONGODB;
 const client = new mongoclient(uri);
 
