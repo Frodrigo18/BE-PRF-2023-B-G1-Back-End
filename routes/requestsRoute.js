@@ -1,14 +1,36 @@
 import express from "express";
-import auth from "../middleware/auth";
-import {} from "../controller/requestController";
+import {auth, authSelf} from "../middleware/auth/auth";
+import { addRequestValidator } from "../middleware/validator/addRequestValidator";
+import UserNotFoundError from "../error/userNotFoundError";
+import {add} from "../controller/requestController";
+import { StationAlreadyExistsError } from "../error/stationAlreadyExistsError";
+import { UserUnexpectedError } from "../error/userUnexpectedError";
+
 const router = express.Router();
 
-/* POST REQUEST */
-router.post("/:user-id/requests", auth, async function (req, res, next) {
+router.post("/:userId/requests", [auth, authSelf, addRequestValidator], async function (req, res, next) {
+  let responseJson = ""
+  let statusCode = 201
+
   try {
-  } catch (error) {}
-  const result = await controller.requestController(req.body);
-  res.json(result);
+    responseJson = await add(req.body);
+  } catch (error) {
+    responseJson = error.message
+
+    if (error instanceof UserNotFoundError){
+      statusCode = 404
+    }
+    else if (error instanceof StationAlreadyExistsError){
+      statusCode = 409
+    }
+    else if (error instanceof UserUnexpectedError){
+      statusCode = 500
+    }
+    else {
+      statusCode = 500
+    }
+  }
+  res.status(statusCode).json(responseJson);
 });
 
 export { router };

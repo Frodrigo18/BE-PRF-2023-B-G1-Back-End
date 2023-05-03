@@ -1,6 +1,5 @@
-import conn from "./connection/conn";
 import dotenv from "dotenv";
-import { ObjectId } from "mongodb";
+import {getConnection} from './connection/conn'
 
 dotenv.config();
 
@@ -8,7 +7,7 @@ const DB = process.env.DB;
 const REQUESTS = "requests";
 
 async function create(request) {
-  const clientMongo = await conn.getConnection();
+  const clientMongo = await getConnection();
   const result = await clientMongo
     .db(DB)
     .collection(REQUESTS)

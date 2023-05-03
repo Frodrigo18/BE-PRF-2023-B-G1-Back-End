@@ -1,10 +1,13 @@
 import dotenv from "dotenv";
 import fetch from "node-fetch";
+import { UserNotFoundError } from "../error/userNotFoundError";
+import {UserUnexpectedError} from "../error/userUnexpectedError"
 
 dotenv.config();
 
 async function findUser(userid) {
   const url = `${process.env.USER_HOST}/users/${userid}`;
+  //TODO add JWT
   const userResponse = await fetch(url);
   const userJson = await userResponse.json();
 
@@ -12,14 +15,12 @@ async function findUser(userid) {
     return userJson;
   } else if (userResponse.status == 404) {
     console.log(`User Id ${userid} not found. \n Error: ${userJson}`);
-    throw new UserNotFoundError(`User Id ${userid} not found`);
-  } else if (userResponse.status == 500) {
+    throw new UserNotFoundError(userid);
+  } else {
     console.log(
       `An unexpected error occurred while finding User Id ${userid}. \n Error: ${userJson}`
     );
-    throw new UserUnexpectedError(
-      `An unexpected error occurred while finding User Id ${userid}.`
-    );
+    throw new UserUnexpectedError(userid);
   }
 }
 

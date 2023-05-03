@@ -16,4 +16,4 @@ async function getConnection() {
   return instance;
 }
 
-module.exports = { getConnection };
+export { getConnection };

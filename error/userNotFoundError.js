@@ -1,6 +1,6 @@
 class UserNotFoundError extends Error {
-  constructor(message) {
-    super(message);
+  constructor(userId) {
+    super(`User Id ${userId} not found`);
     this.name = "UserNotFoundError";
   }
 }
