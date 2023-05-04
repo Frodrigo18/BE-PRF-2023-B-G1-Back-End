@@ -1,11 +1,11 @@
 import { findUser } from "../service/userService.js";
-import { add } from "../service/requestService.js";
+import { add as addRequest } from "../service/requestService.js";
 
-async function addRequest(body, userid) {
-  await findUser(userid);
+async function add(body, userid, userToken) {
+  await findUser(userid, userToken);
   
-  const request = await add(body, userid);
+  const request = await addRequest(body, userid);
   return request;
 }
 
-export { addRequest };
+export { add };

@@ -5,10 +5,14 @@ import {UserUnexpectedError} from "./error/userUnexpectedError.js"
 
 dotenv.config();
 
-async function findUser(userid) {
+async function findUser(userid, userToken) {
   const url = `${process.env.USER_HOST}/users/${userid}`;
   //TODO add JWT
-  const userResponse = await fetch(url);
+  const headers = {
+    'Authorization': `${userToken}`,
+    'Content-Type': 'application/json'
+  };
+  const userResponse = await fetch(url, {headers});
   const userJson = await userResponse.json();
 
   if (userResponse.status == 200) {
