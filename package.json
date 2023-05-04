@@ -13,9 +13,12 @@
     "ejs": "~2.6.1",
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.1.0",
     "morgan": "~1.9.1",
-    "path": "^0.12.7"
+    "node-fetch": "^3.3.1",
+    "path": "^0.12.7",
+    "simple-body-validator": "^1.2.13"
   },
   "type": "module"
 }
