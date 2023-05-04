@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import fetch from "node-fetch";
-import { UserNotFoundError } from "../error/userNotFoundError.js";
-import {UserUnexpectedError} from "../error/userUnexpectedError.js"
+import { UserNotFoundError } from "./error/userNotFoundError.js";
+import {UserUnexpectedError} from "./error/userUnexpectedError.js"
 
 dotenv.config();
 

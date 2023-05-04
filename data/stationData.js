@@ -3,7 +3,7 @@ import {getConnection} from './connection/conn.js'
 
 dotenv.config();
 
-const DB = process.env.DB;
+const DB = process.env.MONGO_DATABASE;
 const STATIONS = "stations";
 
 async function find(serialNumber){

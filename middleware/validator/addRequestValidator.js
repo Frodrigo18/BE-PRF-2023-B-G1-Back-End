@@ -1,11 +1,12 @@
 import { bodyValidation } from './bodyValidator.js';
 
+//TODO validate number
 function addRequestValidator(req, res, next) {
     const rules = {
         serial_number: 'required|string',
         name: 'required|string',
-        longitud: 'required|number',
-        latitude: 'required|number',
+        longitud: 'required',
+        latitude: 'required',
         brand: 'required|string',
         model: 'required|string'
     };

@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import mongodb from "mongodb";
+import {DatabaseConnectionError} from "../error/databaseConnectionError.js";
 
 dotenv.config();
 
@@ -14,9 +15,15 @@ const client = new mongoclient(uri);
 let instance = null;
 
 async function getConnection() {
-  if (instance == null) {
-    instance = await client.connect();
+  try{
+    if (instance == null) {
+      instance = await client.connect();
+    }
+  }catch (error){
+    console.log(error.message);
+    throw new DatabaseConnectionError("An error occurred while connecting to database")
   }
+
   return instance;
 }
 
