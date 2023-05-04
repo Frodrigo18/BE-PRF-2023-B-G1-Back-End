@@ -1,4 +1,4 @@
-import { bodyValidation } from './bodyValidation.js';
+import { bodyValidation } from './bodyValidator.js';
 
 function addRequestValidator(req, res, next) {
     const rules = {

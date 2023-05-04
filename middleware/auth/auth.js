@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { Rol } from "../../model/enum/rol";
+import { Rol } from "../../model/enum/rol.js";
 
 dotenv.config();
 
@@ -11,7 +11,7 @@ function authAdmin(req, res, next) {
     if (user.rol === Rol.ADMIN) {
       next();
     } else{
-      res.status(403).send({ error: error.message });
+      res.status(403).send({ error: "Invalid User Priviledge" });
     }
     
   } catch (error) {
@@ -27,7 +27,7 @@ function authSelf(req, res, next){
       next()
     }
     else{
-      res.status(403).send({ error: error.message });
+      res.status(403).send({ error: "Invalid User Priviledge" });
     }
   } catch(error){
     res.status(401).send({ error: error.message });
@@ -41,7 +41,7 @@ function authUser(req, res, next) {
     if (user.rol === Rol.USER) {
       next();
     } else{
-      res.status(403).send({ error: error.message });
+      res.status(403).send({ error: "Invalid User Priviledge" });
     }
     
   } catch (error) {

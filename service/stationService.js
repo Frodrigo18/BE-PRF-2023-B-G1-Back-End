@@ -1,4 +1,4 @@
-import { find } from "../data/stationData";
+import { find } from "../data/stationData.js";
 
 async function exists(serialNumber) {
     const station = await find(serialNumber);

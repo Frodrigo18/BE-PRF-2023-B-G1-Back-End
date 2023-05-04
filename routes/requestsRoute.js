@@ -1,10 +1,10 @@
 import express from "express";
-import {auth, authSelf} from "../middleware/auth/auth";
-import { addRequestValidator } from "../middleware/validator/addRequestValidator";
-import UserNotFoundError from "../error/userNotFoundError";
-import {add} from "../controller/requestController";
-import { StationAlreadyExistsError } from "../error/stationAlreadyExistsError";
-import { UserUnexpectedError } from "../error/userUnexpectedError";
+import {auth, authSelf} from "../middleware/auth/auth.js";
+import { addRequestValidator } from "../middleware/validator/addRequestValidator.js";
+import {UserNotFoundError} from "../error/userNotFoundError.js";
+import {addRequest} from "../controller/requestController.js";
+import { StationAlreadyExistsError } from "../error/stationAlreadyExistsError.js";
+import { UserUnexpectedError } from "../error/userUnexpectedError.js";
 
 const router = express.Router();
 
@@ -13,7 +13,7 @@ router.post("/:userId/requests", [auth, authSelf, addRequestValidator], async fu
   let statusCode = 201
 
   try {
-    responseJson = await add(req.body);
+    responseJson = await addRequest(req.body);
   } catch (error) {
     responseJson = error.message
 

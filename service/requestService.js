@@ -1,12 +1,12 @@
 import dotenv from "dotenv";
-import { create } from "../data/requestData";
-import { exists } from "./stationService";
-import {StationAlreadyExistsError} from "../error/stationAlreadyExistsError"
-import { RequestStationStatus } from "../model/enum/requestStationStatus";
+import { create } from "../data/requestData.js";
+import { exists } from "./stationService.js";
+import {StationAlreadyExistsError} from "../error/stationAlreadyExistsError.js"
+import { RequestStationStatus } from "../model/enum/requestStationStatus.js";
 
 dotenv.config();
 
-function add(request, userid) {
+async function add(request, userid) {
   if (!exists(request.serialNumber)) {
     const fullRequest = {
       serial_number: request.serialNumber,
@@ -21,7 +21,7 @@ function add(request, userid) {
       approved_by: null,
       approved_at: null
     }
-    create(fullRequest);
+    await create(fullRequest);
   } else {
     console.log(
       `Station serial number ${request.serialNumber} already exists.`

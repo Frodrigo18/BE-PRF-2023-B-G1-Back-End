@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import {getConnection} from './connection/conn'
+import {getConnection} from './connection/conn.js'
 
 dotenv.config();
 
