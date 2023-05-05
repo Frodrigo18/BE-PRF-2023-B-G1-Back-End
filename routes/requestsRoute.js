@@ -2,7 +2,7 @@ import express from "express";
 import {auth, authSelf} from "../middleware/auth/auth.js";
 import { addRequestValidator } from "../middleware/validator/addRequestValidator.js";
 import {UserNotFoundError} from "../service/error/userNotFoundError.js";
-import {addRequest} from "../controller/requestController.js";
+import {add} from "../controller/requestController.js";
 import { StationAlreadyExistsError } from "../service/error/stationAlreadyExistsError.js";
 import { UserUnexpectedError } from "../service/error/userUnexpectedError.js";
 
@@ -13,9 +13,13 @@ router.post("/:userId/requests", [auth, authSelf, addRequestValidator], async fu
   let statusCode = 201
 
   try {
-    responseJson = await addRequest(req.body, req.params.userId);
+    const body = req.body;
+    const userId = req.params.userId;
+    const userToken = req.header("Authorization");
+    responseJson = await add(body, userId, userToken);
+
   } catch (error) {
-    responseJson = error.message
+    responseJson = {message: error.message}
 
     if (error instanceof UserNotFoundError){
       statusCode = 404
