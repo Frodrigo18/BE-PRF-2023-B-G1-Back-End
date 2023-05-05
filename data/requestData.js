@@ -35,4 +35,34 @@ async function findBySerialNumber(serialNumber){
 return result;
 }
 
-export { create, findById, findBySerialNumber};
+async function findAll(pageSize, page){
+    const clientMongo = await getConnection();
+    const count = await clientMongo
+      .db(DB)
+      .collection(REQUESTS)
+      .countDocuments();
+  
+    const skip = pageSize * page;
+    let limit = pageSize;
+
+    console.log("skip ",skip, "limit ", limit, "count ", count);
+
+    if ( count - skip < 0) {
+      limit = count - pageSize * (page -1);
+      console.log("resto ", limit);
+    } 
+      
+    const result = await clientMongo
+      .db(DB)
+      .collection(REQUESTS)
+      .find({})
+      .limit(limit)
+      .skip(skip)
+      .toArray();
+  
+    console.log(result);
+    return result;
+  
+}
+
+export { create, findById, findBySerialNumber, findAll};

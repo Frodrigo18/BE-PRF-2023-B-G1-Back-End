@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
-import { create, findById } from "../data/requestData.js";
-import { exists as existsStation} from "./stationService.js";
-import {StationAlreadyExistsError} from "./error/stationAlreadyExistsError.js"
+import { create, findById, findAll } from "../data/requestData.js";
+import { exists as existsStation } from "./stationService.js";
+import { StationAlreadyExistsError } from "./error/stationAlreadyExistsError.js"
 import { RequestStationStatus } from "../model/enum/requestStationStatus.js";
 import { findBySerialNumber } from "../data/requestData.js";
 
@@ -37,4 +37,11 @@ async function _exist(serialNumber){
   return (request != null && request.status != RequestStationStatus.REJECTED)
 }
 
-export { add };
+async function get(pageSize, page) {
+  const request = await findAll(pageSize, page);
+  return request;  
+
+}
+
+
+export { add , get};
