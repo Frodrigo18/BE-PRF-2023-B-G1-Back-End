@@ -4,7 +4,8 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 import { router as healthRouter } from "./routes/healthcheckRoute.js";
-import { router as requestRouter } from "./routes/requestsRoute.js";
+import { router as requestRouter } from "./routes/userRequestsRoute.js";
+import { router as allRequestRoute } from "./routes/requestRute.js";
 import { fileURLToPath } from "url";
 import cors from "cors";
 
@@ -26,6 +27,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/healthcheck", healthRouter);
 app.use("/users", requestRouter);
+app.use("/requests", allRequestRoute);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
