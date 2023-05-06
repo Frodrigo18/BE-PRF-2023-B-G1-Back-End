@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import { create, findById, findAll, approve as approvedRequest, reject as rejectRequest} from "../data/requestData.js";
 import { exists as existsStation, add as addStation } from "./stationService.js";
 import { StationAlreadyExistsError } from "./error/stationAlreadyExistsError.js";
-import { RequestStationStatus } from "../model/enum/requestStationStatus.js";
+import { RequestStatus } from "../model/enum/requestStatus.js";
 import { findBySerialNumber } from "../data/requestData.js";
 import { RequestNotFoundError} from "./error/requestNotFoundError.js"
 import { RequetInvalidStatusError } from "./error/requestInvalidStatusError.js";
@@ -18,8 +18,8 @@ async function add(request, userid) {
       latitude: request.latitude,
       brand: request.brand,
       model: request.model,
-      status: RequestStationStatus.PENDING,
-      created_by: userid,
+      status: RequestStatus.PENDING,
+      created_by: parseInt(userid),
       created_at: new Date(),
       approved_by: null,
       approved_at: null
@@ -36,40 +36,66 @@ async function add(request, userid) {
 
 async function _exist(serialNumber){
   const request = await findBySerialNumber(serialNumber);
-  return (request != null && request.status != RequestStationStatus.REJECTED)
+  return (request != null && request.status != RequestStatus.REJECTED)
 }
 
-async function get(pageSize, page) {
-  const request = await findAll(pageSize, page);
+async function get(filterRequests) {
+  const request = await findAll(filterRequests);
   return request;  
 }
 
-async function accept(requestId, userId){
+async function accept(requestId, userId, userAdminId){
+  await _find(requestId, userId);
   //TODO add in AWS
-  const request = await _updateStatus(approvedRequest, requestId, userId, RequestStationStatus.APPROVED);
+  const request = await _updateStatus(approvedRequest, userId, requestId, userAdminId, RequestStatus.APPROVED);
   await addStation(request, userId);
   return request;
 }
 
-async function reject(requestId){
-  return await _updateStatus(rejectRequest, requestId, RequestStationStatus.REJECTED);
+async function reject(requestId, userId){
+  return await _updateStatus(rejectRequest, userId, requestId, RequestStatus.REJECTED);
 }
 
-async function _updateStatus(actionCallback, requestId, ...params){
-  const request = await findById(requestId);
+async function _updateStatus(actionCallback, userId, requestId, ...params){
+  const request = await _find(requestId, userId);
 
-  if (request && request.status == RequestStationStatus.PENDING){
+  if (request.status == RequestStatus.PENDING){
     await actionCallback(requestId, ...params);
     return await findById(requestId);
   }
-  else if (request){
+  else {
     console.log(`Invalid status ${request.status} for Request ID ${requestId} for current operation`);
     throw new RequetInvalidStatusError(requestId, request.status)
   }
-  else{
-    console.log(`Request ${requestId} not found error`);
-    throw new RequestNotFoundError(requestId)
+}
+
+async function _find(requestId, userId){
+  const request = await findById(requestId);
+
+  if (request && request.created_by == userId){
+    return request;
   }
+  else{
+    console.log(`Request ${requestId} not found for User Id ${userId}`);
+    throw new RequestNotFoundError(requestId, userId)
+  }
+}
+
+async function _createAwsIoT(request){
+  const url = `${process.env.AWS_STF_HOST}/ngsi-ld/v1/entities`;
+  const body = {
+    id: `urn:ngsi-ld:Device:${request.name}`,
+    type: "Device",
+    serialNumber: {
+      type: "Property",
+      value: request.serial_number
+    }
+  }
+  const options = {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: { 'Content-Type': 'application/json' }
+  };
 }
 
 export { add , get, accept, reject};

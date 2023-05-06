@@ -1,7 +1,7 @@
-const RequestStationStatus = {
+const RequestStatus = {
     PENDING: "PENDING",
     APPROVED: "APPROVED",
     REJECTED: "REJECTED"
 }
 
-export {RequestStationStatus}
+export {RequestStatus}

@@ -15,7 +15,7 @@ async function add(request, userId){
         brand: request.brand,
         model: request.model,
         status: StationStatus.ACTIVE,
-        created_by: userId,
+        created_by: parseInt(userId),
         created_at: new Date()
     };
 

@@ -1,6 +1,6 @@
 class RequestNotFoundError extends Error {
-    constructor(requestId) {
-      super(`Request ${requestId} not found error`);
+    constructor(requestId, userId) {
+      super(`Request ${requestId} not found for User Id ${userId}`);
       this.name = "RequestNotFoundError";
     }
   }

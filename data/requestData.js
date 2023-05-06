@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
 import {createObjectId} from './utils/createObjectId.js';
 import {getConnection} from './connection/conn.js';
-import { RequestStationStatus } from "../model/enum/requestStationStatus.js";
 
 dotenv.config();
 
@@ -36,32 +35,42 @@ async function findBySerialNumber(serialNumber){
 return result;
 }
 
-async function findAll(pageSize, page){
-    const clientMongo = await getConnection();
-    const count = await clientMongo
-      .db(DB)
-      .collection(REQUESTS)
-      .countDocuments();
-  
-    const skip = pageSize * page;
-    let limit = pageSize;
+async function findAll(filterRequests){
 
-    console.log("skip ",skip, "limit ", limit, "count ", count);
+    const filter = {};
 
-    if ( count - skip < 0) {
-      limit = count - pageSize * (page -1);
-      console.log("resto ", limit);
+    if (filterRequests.name) {
+      filter.name = filterRequests.name;
     } 
+    if (filterRequests.serialNumber) {
+      filter.serial_number = filterRequests.serialNumber;
+    }
+    if (filterRequests.status) {
+      filter.status = filterRequests.status;
+    }
+    if (filterRequests.date) {
+      const gte = new Date(filterRequests.date);
+      const lt = new Date(gte.getTime() + 24 * 60 * 60 * 1000) ;
+
+      filter.created_at = { 
+        $gte: gte,
+        $lt: lt
+      }
+    }
+
+    const clientMongo = await getConnection();
+
+    const skip = filterRequests.pageSize * filterRequests.page;
+    let limit = filterRequests.pageSize;
       
     const result = await clientMongo
       .db(DB)
       .collection(REQUESTS)
-      .find({})
+      .find(filter)
       .limit(limit)
       .skip(skip)
       .toArray();
   
-    console.log(result);
     return result;
 }
 
@@ -70,7 +79,7 @@ async function approve(id, userId, state){
     $set: 
     { 
       "status": state,
-      "approved_by": userId,
+      "approved_by": parseInt(userId),
       "approved_at": new Date()
     }
   }
