@@ -18,8 +18,6 @@ router.get("/", [authAdmin, validatorSatus, validatorDate], async function (req,
     let responseJson = ""
     let statusCode = 200
 
-    console.log("router: /",pageSize,"/",page,"/", queryName,"/",querySerialNumber,"/",queryStatus,"/",queryDate);
-
     const filterRequests = new FilterRequests(pageSize, page, queryName, querySerialNumber, queryStatus, queryDate);
 
     try {

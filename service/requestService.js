@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import { create, findById, findAll } from "../data/requestData.js";
 import { exists as existsStation } from "./stationService.js";
 import { StationAlreadyExistsError } from "./error/stationAlreadyExistsError.js"
-import { RequestStatus } from "../model/enun/requestStatus.js";
+import { RequestStatus } from "../model/enum/requestStatus.js";
 import { findBySerialNumber } from "../data/requestData.js";
 
 dotenv.config();

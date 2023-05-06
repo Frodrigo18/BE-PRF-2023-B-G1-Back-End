@@ -58,8 +58,6 @@ async function findAll(filterRequests){
       }
     }
 
-    console.log("data filter ", filter);
-
     const clientMongo = await getConnection();
     const count = await clientMongo
       .db(DB)
