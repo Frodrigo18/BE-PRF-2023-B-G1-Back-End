@@ -1,9 +1,11 @@
 import dotenv from "dotenv";
-import { create, findById, findAll } from "../data/requestData.js";
-import { exists as existsStation } from "./stationService.js";
-import { StationAlreadyExistsError } from "./error/stationAlreadyExistsError.js"
+import { create, findById, findAll, approve as approvedRequest, reject as rejectRequest} from "../data/requestData.js";
+import { exists as existsStation, add as addStation } from "./stationService.js";
+import { StationAlreadyExistsError } from "./error/stationAlreadyExistsError.js";
 import { RequestStationStatus } from "../model/enum/requestStationStatus.js";
 import { findBySerialNumber } from "../data/requestData.js";
+import { RequestNotFoundError} from "./error/requestNotFoundError.js"
+import { RequetInvalidStatusError } from "./error/requestInvalidStatusError.js";
 
 dotenv.config();
 
@@ -40,8 +42,34 @@ async function _exist(serialNumber){
 async function get(pageSize, page) {
   const request = await findAll(pageSize, page);
   return request;  
-
 }
 
+async function accept(requestId, userId){
+  //TODO add in AWS
+  const request = await _updateStatus(approvedRequest, requestId, userId, RequestStationStatus.APPROVED);
+  await addStation(request, userId);
+  return request;
+}
 
-export { add , get};
+async function reject(requestId){
+  return await _updateStatus(rejectRequest, requestId, RequestStationStatus.REJECTED);
+}
+
+async function _updateStatus(actionCallback, requestId, ...params){
+  const request = await findById(requestId);
+
+  if (request && request.status == RequestStationStatus.PENDING){
+    await actionCallback(requestId, ...params);
+    return await findById(requestId);
+  }
+  else if (request){
+    console.log(`Invalid status ${request.status} for Request ID ${requestId} for current operation`);
+    throw new RequetInvalidStatusError(requestId, request.status)
+  }
+  else{
+    console.log(`Request ${requestId} not found error`);
+    throw new RequestNotFoundError(requestId)
+  }
+}
+
+export { add , get, accept, reject};

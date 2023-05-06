@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import {createObjectId} from './utils/createObjectId.js';
 import {getConnection} from './connection/conn.js';
+import { RequestStationStatus } from "../model/enum/requestStationStatus.js";
 
 dotenv.config();
 
@@ -62,7 +63,39 @@ async function findAll(pageSize, page){
   
     console.log(result);
     return result;
-  
 }
 
-export { create, findById, findBySerialNumber, findAll};
+async function approve(id, userId, state){
+  const update = {
+    $set: 
+    { 
+      "status": state,
+      "approved_by": userId,
+      "approved_at": new Date()
+    }
+  }
+
+  return await _updateStatus(id, update);
+}
+
+async function reject(id, state){
+  const update = {
+    $set: 
+    { 
+      "status": state
+    }
+  }
+  return await _updateStatus(id, update);
+}
+
+async function _updateStatus(id, update){
+  const objectId = createObjectId(id);
+  const clientMongo = await getConnection();
+  const result = await clientMongo
+    .db(DB)
+    .collection(REQUESTS)
+    .updateOne({_id: objectId}, update)
+  return result;
+}
+
+export { create, findById, findBySerialNumber, findAll, approve, reject};

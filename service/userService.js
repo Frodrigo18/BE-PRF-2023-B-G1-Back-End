@@ -7,7 +7,6 @@ dotenv.config();
 
 async function findUser(userid, userToken) {
   const url = `${process.env.USER_HOST}/users/${userid}`;
-  //TODO add JWT
   const headers = {
     'Authorization': userToken,
     'Content-Type': 'application/json'
