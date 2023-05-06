@@ -40,7 +40,7 @@ async function add(request, userid) {
 
 async function _exist(serialNumber){
   const request = await findBySerialNumber(serialNumber);
-  return (request != null && request.status != RequestStatus.REJECTED)
+  return (request != null && request.some(r => r.status != RequestStatus.REJECTED))
 }
 
 async function get(filterRequests) {
@@ -51,9 +51,9 @@ async function get(filterRequests) {
 async function accept(requestId, user, userAdminId){
   const request = await _find(requestId, user.id);
   await _createAwsIoT(request);
-  await _updateStatus(approvedRequest, user.id, requestId, userAdminId, RequestStatus.APPROVED);
+  const updatedRequest = await _updateStatus(approvedRequest, user.id, requestId, userAdminId, RequestStatus.APPROVED);
   await addStation(request, user.id);
-  return request;
+  return updatedRequest;
 }
 
 async function reject(requestId, userId){

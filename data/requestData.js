@@ -31,8 +31,9 @@ async function findBySerialNumber(serialNumber){
   const result = await clientMongo
     .db(DB)
     .collection(REQUESTS)
-    .findOne({serial_number: serialNumber})
-return result;
+    .find({serial_number: serialNumber})
+    .toArray();
+  return result;
 }
 
 async function findAll(filterRequests){
