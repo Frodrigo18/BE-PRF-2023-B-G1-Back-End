@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import { create, findById, findAll } from "../data/requestData.js";
 import { exists as existsStation } from "./stationService.js";
 import { StationAlreadyExistsError } from "./error/stationAlreadyExistsError.js"
-import { RequestStationStatus } from "../model/enum/requestStationStatus.js";
+import { RequestStatus } from "../model/enun/requestStatus.js";
 import { findBySerialNumber } from "../data/requestData.js";
 
 dotenv.config();
@@ -16,7 +16,7 @@ async function add(request, userid) {
       latitude: request.latitude,
       brand: request.brand,
       model: request.model,
-      status: RequestStationStatus.PENDING,
+      status: RequestStatus.PENDING,
       created_by: userid,
       created_at: new Date(),
       approved_by: null,
@@ -34,11 +34,11 @@ async function add(request, userid) {
 
 async function _exist(serialNumber){
   const request = await findBySerialNumber(serialNumber);
-  return (request != null && request.status != RequestStationStatus.REJECTED)
+  return (request != null && request.status != RequestStatus.REJECTED)
 }
 
-async function get(pageSize, page) {
-  const request = await findAll(pageSize, page);
+async function get(filterRequests) {
+  const request = await findAll(filterRequests);
   return request;  
 
 }

@@ -1,5 +1,5 @@
 import { find } from "../data/stationData.js";
-import {StationStatus} from "../model/enum/stationStatus.js"
+import {StationStatus} from "../model/enun/stationStatus.js"
 
 async function exists(serialNumber) {
     const station = await find(serialNumber);

@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { Rol } from "../../model/enum/rol.js";
+import { Rol } from "../../model/enun/rol.js";
 
 dotenv.config();
 
