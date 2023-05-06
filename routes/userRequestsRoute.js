@@ -8,6 +8,8 @@ import { UserUnexpectedError } from "../service/error/userUnexpectedError.js";
 import { RequestNotFoundError } from "../service/error/requestNotFoundError.js";
 import { RequetInvalidStatusError } from "../service/error/requestInvalidStatusError.js";
 import { UserRequestError } from "../service/error/userRequestError.js";
+import { AwsRequestError } from "../service/error/awsRequestError.js";
+import { AwsUnexpectedError } from "../service/error/awsUnexpectedError.js";
 
 const router = express.Router();
 
@@ -58,7 +60,10 @@ router.patch("/:userId/requests/:requestId/accept", [authAdmin], async function 
     else if (error instanceof RequetInvalidStatusError){
       statusCode = 409
     }
-    else if (error instanceof UserUnexpectedError || error instanceof UserRequestError){
+    else if (error instanceof UserUnexpectedError ||
+             error instanceof UserRequestError ||
+             error instanceof AwsUnexpectedError ||
+             error instanceof AwsRequestError){
       statusCode = 500
     }
     else {

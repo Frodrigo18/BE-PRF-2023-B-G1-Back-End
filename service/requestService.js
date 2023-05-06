@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import fetch from "node-fetch";
 import { create, findById, findAll, approve as approvedRequest, reject as rejectRequest} from "../data/requestData.js";
 import { exists as existsStation, add as addStation } from "./stationService.js";
 import { StationAlreadyExistsError } from "./error/stationAlreadyExistsError.js";
@@ -6,6 +7,8 @@ import { RequestStatus } from "../model/enum/requestStatus.js";
 import { findBySerialNumber } from "../data/requestData.js";
 import { RequestNotFoundError} from "./error/requestNotFoundError.js"
 import { RequetInvalidStatusError } from "./error/requestInvalidStatusError.js";
+import { AwsUnexpectedError } from "./error/awsUnexpectedError.js";
+import { AwsRequestError } from "./error/awsRequestError.js";
 
 dotenv.config();
 
@@ -26,7 +29,8 @@ async function add(request, userid) {
     }
     const newRequest = await create(fullRequest);
     return await findById(newRequest.insertedId)
-  } else {
+  } 
+  else {
     console.log(
       `Station serial number ${request.serial_number} already exists.`
     );
@@ -45,9 +49,9 @@ async function get(filterRequests) {
 }
 
 async function accept(requestId, userId, userAdminId){
-  await _find(requestId, userId);
-  //TODO add in AWS
-  const request = await _updateStatus(approvedRequest, userId, requestId, userAdminId, RequestStatus.APPROVED);
+  const request = await _find(requestId, userId);
+  await _createAwsIoT(request);
+  await _updateStatus(approvedRequest, userId, requestId, userAdminId, RequestStatus.APPROVED);
   await addStation(request, userId);
   return request;
 }
@@ -82,6 +86,11 @@ async function _find(requestId, userId){
 }
 
 async function _createAwsIoT(request){
+  await _createAwsEntity(request);
+  await _createAwsThing(request);
+}
+
+async function _createAwsEntity(request){
   const url = `${process.env.AWS_STF_HOST}/ngsi-ld/v1/entities`;
   const body = {
     id: `urn:ngsi-ld:Device:${request.name}`,
@@ -93,9 +102,65 @@ async function _createAwsIoT(request){
   }
   const options = {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify(body),
     headers: { 'Content-Type': 'application/json' }
   };
+
+  return await _awsAddStationRequest(url, options, request._id);
+}
+
+async function _createAwsThing(request){
+  const url = `${process.env.AWS_STF_HOST}/iot/things`;
+  const body = {
+    id: `urn:ngsi-ld:Device:${request.name}`,
+    type: "Device",
+    thingGroups: {
+        type: "Property",
+        value: [
+            "LoRaWAN"
+        ]
+    },
+    location: {
+        type: "GeoProperty",
+        value: {
+            type: "Point",
+            coordinates: [
+                request.longitud,
+                request.latitude
+            ]
+        }
+    }
+  }
+  const options = {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: { 'Content-Type': 'application/json' }
+  };
+
+  return await _awsAddStationRequest(url, options, request._id);
+}
+
+async function _awsAddStationRequest(url, options, requestId){
+  try {
+    const awsResponse = await fetch(url, options);
+    const awsJson = await awsResponse.json();
+    
+    switch (awsResponse.status) {
+      case 200:
+        return awsJson;
+      default:
+        console.log(`An unexpected error occured while adding station for Request Id ${requestId} to AWS. \n Error: ${userJson}`);
+        throw new AwsUnexpectedError(requestId);
+    }
+  } 
+  catch (error) {
+    if (error instanceof AwsUnexpectedError) {
+      throw error;
+    } else {
+      console.log(`An error occured whie requesting User Id ${requestId}. \n Error: ${error}`);
+      throw new AwsRequestError(requestId);
+    }
+  }
 }
 
 export { add , get, accept, reject};
