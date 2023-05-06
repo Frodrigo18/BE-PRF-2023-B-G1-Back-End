@@ -1,4 +1,4 @@
-import { bodyValidation } from './bodyValidator.js';
+import {bodyValidation} from './bodyValidation.js';
 
 //TODO validate number
 function addRequestValidator(req, res, next) {

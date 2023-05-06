@@ -1,6 +1,6 @@
 import express from "express";
 import {auth, authSelf} from "../middleware/auth/auth.js";
-import { addRequestValidator } from "../middleware/validator/addRequestValidator.js";
+import {addRequestValidator} from "../middleware/validator/body/addRequestValidator.js"; 
 import {UserNotFoundError} from "../service/error/userNotFoundError.js";
 import {add} from "../controller/requestController.js";
 import { StationAlreadyExistsError } from "../service/error/stationAlreadyExistsError.js";

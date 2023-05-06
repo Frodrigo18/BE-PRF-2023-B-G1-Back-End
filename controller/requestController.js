@@ -10,8 +10,8 @@ async function add(body, userid, userToken) {
   return request;
 }
 
-async function get(pageSize, page) {
-  const request = await getRequests(pageSize, page);
+async function get(filterRequests) {
+  const request = await getRequests(filterRequests);
   return request;
 }
 
