@@ -31,8 +31,9 @@ async function findBySerialNumber(serialNumber){
   const result = await clientMongo
     .db(DB)
     .collection(REQUESTS)
-    .findOne({serial_number: serialNumber})
-return result;
+    .find({serial_number: serialNumber})
+    .toArray();
+  return result;
 }
 
 async function findAll(filterRequests){
@@ -59,17 +60,9 @@ async function findAll(filterRequests){
     }
 
     const clientMongo = await getConnection();
-    const count = await clientMongo
-      .db(DB)
-      .collection(REQUESTS)
-      .countDocuments();
-  
+
     const skip = filterRequests.pageSize * filterRequests.page;
     let limit = filterRequests.pageSize;
-
-    if ( count - skip < 0) {
-      limit = count - filterRequests.pageSize * (filterRequests.page -1);
-    } 
       
     const result = await clientMongo
       .db(DB)
@@ -80,7 +73,39 @@ async function findAll(filterRequests){
       .toArray();
   
     return result;
-  
 }
 
-export { create, findById, findBySerialNumber, findAll};
+async function approve(id, userId, state){
+  const update = {
+    $set: 
+    { 
+      "status": state,
+      "approved_by": parseInt(userId),
+      "approved_at": new Date()
+    }
+  }
+
+  return await _updateStatus(id, update);
+}
+
+async function reject(id, state){
+  const update = {
+    $set: 
+    { 
+      "status": state
+    }
+  }
+  return await _updateStatus(id, update);
+}
+
+async function _updateStatus(id, update){
+  const objectId = createObjectId(id);
+  const clientMongo = await getConnection();
+  const result = await clientMongo
+    .db(DB)
+    .collection(REQUESTS)
+    .updateOne({_id: objectId}, update)
+  return result;
+}
+
+export { create, findById, findBySerialNumber, findAll, approve, reject};

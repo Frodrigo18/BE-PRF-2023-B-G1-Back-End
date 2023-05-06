@@ -1,10 +1,15 @@
 import express from "express";
-import {auth, authSelf} from "../middleware/auth/auth.js";
-import {addRequestValidator} from "../middleware/validator/body/addRequestValidator.js"; 
-import {UserNotFoundError} from "../service/error/userNotFoundError.js";
-import {add} from "../controller/requestController.js";
+import { auth, authAdmin, authSelf } from "../middleware/auth/auth.js";
+import { addRequestValidator } from "../middleware/validator/body/addRequestValidator.js";
+import { UserNotFoundError } from "../service/error/userNotFoundError.js";
+import { add, accept, reject } from "../controller/requestController.js";
 import { StationAlreadyExistsError } from "../service/error/stationAlreadyExistsError.js";
 import { UserUnexpectedError } from "../service/error/userUnexpectedError.js";
+import { RequestNotFoundError } from "../service/error/requestNotFoundError.js";
+import { RequetInvalidStatusError } from "../service/error/requestInvalidStatusError.js";
+import { UserRequestError } from "../service/error/userRequestError.js";
+import { AwsRequestError } from "../service/error/awsRequestError.js";
+import { AwsUnexpectedError } from "../service/error/awsUnexpectedError.js";
 
 const router = express.Router();
 
@@ -27,7 +32,66 @@ router.post("/:userId/requests", [auth, authSelf, addRequestValidator], async fu
     else if (error instanceof StationAlreadyExistsError){
       statusCode = 409
     }
-    else if (error instanceof UserUnexpectedError){
+    else if (error instanceof UserUnexpectedError || error instanceof UserRequestError){
+      statusCode = 500
+    }
+    else {
+      statusCode = 500
+    }
+  }
+  res.status(statusCode).json(responseJson);
+});
+
+router.patch("/:userId/requests/:requestId/accept", [authAdmin], async function (req, res, next){
+  //TODO send email to user
+  let responseJson = ""
+  let statusCode = 200
+
+  try{
+    const userId = req.params.userId;
+    const requestId = req.params.requestId
+    const userToken = req.header("Authorization");
+    responseJson = await accept(userId, req.adminId, requestId, userToken)
+  }catch (error){
+    responseJson = {message: error.message}
+    if (error instanceof UserNotFoundError || error instanceof RequestNotFoundError){
+      statusCode = 404
+    }
+    else if (error instanceof RequetInvalidStatusError){
+      statusCode = 409
+    }
+    else if (error instanceof UserUnexpectedError ||
+             error instanceof UserRequestError ||
+             error instanceof AwsUnexpectedError ||
+             error instanceof AwsRequestError){
+      statusCode = 500
+    }
+    else {
+      statusCode = 500
+    }
+  }
+  res.status(statusCode).json(responseJson);
+});
+
+router.patch("/:userId/requests/:requestId/reject", [authAdmin], async function (req, res, next){
+  //TODO add body and send email to user
+  let responseJson = ""
+  let statusCode = 200
+
+  try{
+    const userId = req.params.userId;
+    const requestId = req.params.requestId
+    const userToken = req.header("Authorization");
+    responseJson = await reject(userId, requestId, userToken)
+  }catch (error){
+    responseJson = {message: error.message}
+    if (error instanceof UserNotFoundError || error instanceof RequestNotFoundError){
+      statusCode = 404
+    }
+    else if (error instanceof RequetInvalidStatusError){
+      statusCode = 409
+    }
+    else if (error instanceof UserUnexpectedError || error instanceof UserRequestError){
       statusCode = 500
     }
     else {

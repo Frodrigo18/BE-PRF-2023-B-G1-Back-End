@@ -8,6 +8,7 @@ function authAdmin(req, res, next) {
   try {
     let token = req.header("Authorization");
     const user = jwt.verify(token, process.env.SECRETPASS);
+    req.adminId = user.id;
     if (user.rol === Rol.ADMIN) {
       next();
     } else{

@@ -1,5 +1,5 @@
 import { findUser } from "../service/userService.js";
-import { add as addRequest } from "../service/requestService.js";
+import { add as addRequest, accept as acceptRequest, reject as rejectRequest} from "../service/requestService.js";
 import { get as getRequests } from "../service/requestService.js";
 
 
@@ -15,4 +15,18 @@ async function get(filterRequests) {
   return request;
 }
 
-export { add, get};
+async function accept(userId, adminUserId, requestId, userToken){
+  const user = await findUser(userId, userToken);
+  const request = await acceptRequest(requestId, user, adminUserId);
+  return request;
+
+}
+
+async function reject(userId, requestId, userToken){
+  await findUser(userId, userToken);
+
+  const request = await rejectRequest(requestId, userId);
+  return request;
+}
+
+export { add, get, accept, reject };
