@@ -16,9 +16,8 @@ async function get(filterRequests) {
 }
 
 async function accept(userId, adminUserId, requestId, userToken){
-  await findUser(userId, userToken);
-
-  const request = await acceptRequest(requestId, userId, adminUserId);
+  const user = await findUser(userId, userToken);
+  const request = await acceptRequest(requestId, user, adminUserId);
   return request;
 
 }

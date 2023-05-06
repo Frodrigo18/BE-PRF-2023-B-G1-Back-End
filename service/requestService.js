@@ -48,11 +48,11 @@ async function get(filterRequests) {
   return request;  
 }
 
-async function accept(requestId, userId, userAdminId){
-  const request = await _find(requestId, userId);
+async function accept(requestId, user, userAdminId){
+  const request = await _find(requestId, user.id);
   await _createAwsIoT(request);
-  await _updateStatus(approvedRequest, userId, requestId, userAdminId, RequestStatus.APPROVED);
-  await addStation(request, userId);
+  await _updateStatus(approvedRequest, user.id, requestId, userAdminId, RequestStatus.APPROVED);
+  await addStation(request, user.id);
   return request;
 }
 
