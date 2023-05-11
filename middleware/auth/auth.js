@@ -9,6 +9,7 @@ function authAdmin(req, res, next) {
     let token = req.header("Authorization");
     const user = jwt.verify(token, process.env.SECRETPASS);
     req.adminId = user.id;
+    req.rol = user.rol;
     if (user.rol === Rol.ADMIN) {
       next();
     } else{
@@ -24,7 +25,7 @@ function authSelf(req, res, next){
   try{
     let token = req.header("Authorization");
     const user = jwt.verify(token, process.env.SECRETPASS);
-    if (user.id == req.params.userId){
+    if (user.id == req.params.userId || user.rol == Rol.ADMIN){
       next()
     }
     else{
@@ -39,6 +40,7 @@ function authUser(req, res, next) {
   try {
     let token = req.header("Authorization");
     const user = jwt.verify(token, process.env.SECRETPASS);
+    req.rol = user.rol;
     if (user.rol === Rol.USER) {
       next();
     } else{

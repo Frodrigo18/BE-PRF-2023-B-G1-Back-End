@@ -10,6 +10,8 @@ import { RequetInvalidStatusError } from "../service/error/requestInvalidStatusE
 import { UserRequestError } from "../service/error/userRequestError.js";
 import { AwsRequestError } from "../service/error/awsRequestError.js";
 import { AwsUnexpectedError } from "../service/error/awsUnexpectedError.js";
+import { suspend } from "../controller/stationController.js";
+import {StationNotFoundError} from "./error/stationNotFoundError.js";
 
 const router = express.Router();
 
@@ -99,6 +101,28 @@ router.patch("/:userId/requests/:requestId/reject", [authAdmin], async function 
     }
   }
   res.status(statusCode).json(responseJson);
+});
+
+router.patch("/:stationId/suspend", [authSelf], async function (req, res, next){
+  let responseJson = ""
+  let statusCode = 200
+
+  try {
+      const userId = req.params.userId;
+      const stationId = req.params.stationId;
+      const userToken = req.header("Authorization");
+
+      responseJson = await suspend(userId, stationId, req.rol, userToken);
+
+  } catch (error) {
+      responseJson = { message: error.message };
+      if (error instanceof StationNotFoundError){
+          statusCode = 404;
+      } else {
+          statusCode = 500;
+      }
+    }
+    res.status(statusCode).json(responseJson);
 });
 
 export { router };

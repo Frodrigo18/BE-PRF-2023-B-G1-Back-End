@@ -36,4 +36,16 @@ async function create(station){
     return result;
 }
 
-export {findBySerialNumber, create, findById}
+async function update(id, station) {
+    const objectId = createObjectId(id);
+    const filter = { _id: objectId };
+    const updateDoc = { $set: station };
+    const clientMongo = await getConnection();
+    const result = await clientMongo
+        .db(DB)
+        .collection(STATIONS)
+        .updateOne(filter, updateDoc);
+    return result;
+  }
+
+export {findBySerialNumber, create, findById, update}
