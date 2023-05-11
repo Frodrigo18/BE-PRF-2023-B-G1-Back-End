@@ -9,6 +9,7 @@ import { RequestNotFoundError} from "./error/requestNotFoundError.js"
 import { RequetInvalidStatusError } from "./error/requestInvalidStatusError.js";
 import { AwsUnexpectedError } from "./error/awsUnexpectedError.js";
 import { AwsRequestError } from "./error/awsRequestError.js";
+import { sendMail } from "./mailService.js";
 
 dotenv.config();
 
@@ -53,11 +54,14 @@ async function accept(requestId, user, userAdminId){
   await _createAwsIoT(request);
   const updatedRequest = await _updateStatus(approvedRequest, user.id, requestId, userAdminId, RequestStatus.APPROVED);
   await addStation(request, user.id);
+  sendMail('j.gendler.g@gmail.com', "johanna.gendler", RequestStatus.APPROVED);
   return updatedRequest;
 }
 
 async function reject(requestId, userId){
-  return await _updateStatus(rejectRequest, userId, requestId, RequestStatus.REJECTED);
+  const request = await _updateStatus(rejectRequest, userId, requestId, RequestStatus.REJECTED);
+  sendMail('j.gendler.g@gmail.com', "johanna.gendler", RequestStatus.REJECTED, "no soportamos la marca SAMSUNG");
+  return request;
 }
 
 async function _updateStatus(actionCallback, userId, requestId, ...params){
