@@ -11,7 +11,7 @@ import { UserRequestError } from "../service/error/userRequestError.js";
 import { AwsRequestError } from "../service/error/awsRequestError.js";
 import { AwsUnexpectedError } from "../service/error/awsUnexpectedError.js";
 import { suspend } from "../controller/stationController.js";
-import {StationNotFoundError} from "./error/stationNotFoundError.js";
+import {StationNotFoundError} from "../service/error/stationNotFoundError.js";
 
 const router = express.Router();
 
