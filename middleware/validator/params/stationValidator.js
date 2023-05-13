@@ -1,8 +1,8 @@
-import { RequestStatus } from "../../../model/enum/requestStatus.js";
+import { StationStatus } from "../../../model/enum/StationStatus.js";
 
 function validatorStatus(req, res, next) {
   const status = req.query.status;
-  const validStatus = Object.values(RequestStatus);
+  const validStatus = Object.values(StationStatus);
 
   if (!status) {
     next();
