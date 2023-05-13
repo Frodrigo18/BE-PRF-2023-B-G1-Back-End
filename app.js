@@ -3,9 +3,9 @@ import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import { router as healthRoute } from "./routes/healthcheckRoute.js";
-import { router as userRequestRoute } from "./routes/userRequestsRoute.js";
+import { router as healthRouter } from "./routes/healthcheckRoute.js";
 import { router as requestRoute } from "./routes/requestRoute.js";
+import { router as userRouter } from "./routes/userRoute.js";
 import { router as stationRoute } from "./routes/stationRoute.js";
 import { fileURLToPath } from "url";
 import cors from "cors";
@@ -26,8 +26,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/healthcheck", healthRoute);
-app.use("/users", userRequestRoute);
+app.use("/healthcheck", healthRouter);
+app.use("/users", userRouter);
 app.use("/requests", requestRoute);
 app.use("/stations", stationRoute);
 
