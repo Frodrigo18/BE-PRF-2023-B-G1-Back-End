@@ -36,20 +36,20 @@ async function create(station) {
   return result;
 }
 
-async function findAll(filterRequests) {
+async function findAll(filterStation) {
   const filter = {};
 
-  if (filterRequests.name) {
-    filter.name = filterRequests.name;
+  if (filterStation.name) {
+    filter.name = filterStation.name;
   }
-  if (filterRequests.serialNumber) {
-    filter.serial_number = filterRequests.serialNumber;
+  if (filterStation.serialNumber) {
+    filter.serial_number = filterStation.serialNumber;
   }
-  if (filterRequests.status) {
-    filter.status = filterRequests.status;
+  if (filterStation.status) {
+    filter.status = filterStation.status;
   }
-  if (filterRequests.date) {
-    const gte = new Date(filterRequests.date);
+  if (filterStation.date) {
+    const gte = new Date(filterStation.date);
     const lt = new Date(gte.getTime() + 24 * 60 * 60 * 1000);
 
     filter.created_at = {
@@ -60,8 +60,8 @@ async function findAll(filterRequests) {
 
   const clientMongo = await getConnection();
 
-  const skip = filterRequests.pageSize * filterRequests.page;
-  let limit = filterRequests.pageSize;
+  const skip = filterStation.pageSize * filterStation.page;
+  let limit = filterStation.pageSize;
 
   const result = await clientMongo
     .db(DB)

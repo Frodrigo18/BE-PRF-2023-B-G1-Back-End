@@ -1,11 +1,9 @@
 import express from "express";
 import { authAdmin } from "../middleware/auth/auth.js";
 import { get } from "../controller/stationController.js";
-import {
-  validatorStatus,
-  validatorDate,
-} from "../middleware/validator/params/stationValidator.js";
-import { FilterRequests } from "../model/filterRequests.js";
+import { validatorStatus } from "../middleware/validator/params/stationValidator.js";
+import { validatorDate } from "../middleware/validator/params/dateValidator.js";
+import { FilterStation } from "../model/filterStation.js";
 
 const router = express.Router();
 
@@ -23,7 +21,7 @@ router.get(
     let responseJson = "";
     let statusCode = 200;
 
-    const filterRequests = new FilterRequests(
+    const filterStation = new FilterStation(
       pageSize,
       page,
       queryName,
@@ -33,7 +31,7 @@ router.get(
     );
 
     try {
-      responseJson = await get(filterRequests);
+      responseJson = await get(filterStation);
     } catch (error) {
       responseJson = { message: error.message };
     }
