@@ -1,4 +1,4 @@
-class FilterRequests {
+class FilterStation {
   constructor(pageSize, page, name, serialNumber, status, date) {
     this.pageSize = pageSize;
     this.page = page;
@@ -9,4 +9,4 @@ class FilterRequests {
   }
 }
 
-export { FilterRequests };
+export { FilterStation };
