@@ -1,10 +1,8 @@
 import express from "express";
 import { authAdmin } from "../middleware/auth/auth.js";
 import { get } from "../controller/requestController.js";
-import {
-  validatorStatus,
-  validatorDate,
-} from "../middleware/validator/params/requestValidator.js";
+import { validatorStatus } from "../middleware/validator/params/requestValidator.js";
+import { validatorDate } from "../middleware/validator/params/dateValidator.js";
 import { FilterRequests } from "../model/filterRequests.js";
 
 const router = express.Router();
