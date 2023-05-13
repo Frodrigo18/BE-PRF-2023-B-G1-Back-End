@@ -15,7 +15,7 @@ async function add(request, userId) {
   const fullStation = {
     serial_number: request.serial_number,
     name: request.name,
-    longitud: request.longitud,
+    longitud: request.longitude,
     latitud: request.latitud,
     brand: request.brand,
     model: request.model,
