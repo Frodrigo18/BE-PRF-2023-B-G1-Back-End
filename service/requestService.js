@@ -9,7 +9,7 @@ import { RequestNotFoundError} from "./error/requestNotFoundError.js"
 import { RequetInvalidStatusError } from "./error/requestInvalidStatusError.js";
 import { AwsUnexpectedError } from "./error/awsUnexpectedError.js";
 import { AwsRequestError } from "./error/awsRequestError.js";
-import { sendMail } from "./mailService.js";
+import { sendRequestMail } from "./mailService.js";
 
 dotenv.config();
 
@@ -33,7 +33,7 @@ async function add(request, userid) {
   } 
   else {
     console.log(
-      `Station serial number ${request.serial_number} already exists.`
+      `ERROR: Station serial number ${request.serial_number} already exists.`
     );
     throw new StationAlreadyExistsError(request.serial_number);
   }
@@ -54,13 +54,13 @@ async function accept(requestId, user, userAdminId){
   await _createAwsIoT(request);
   const updatedRequest = await _updateStatus(approvedRequest, user.id, requestId, userAdminId, RequestStatus.APPROVED);
   await addStation(request, user.id);
-  sendMail('j.gendler.g@gmail.com', "johanna.gendler", RequestStatus.APPROVED);
+  sendRequestMail(user.mail, user.user_name, RequestStatus.APPROVED, null, updatedRequest);
   return updatedRequest;
 }
 
-async function reject(requestId, userId){
-  const request = await _updateStatus(rejectRequest, userId, requestId, RequestStatus.REJECTED);
-  sendMail('j.gendler.g@gmail.com', "johanna.gendler", RequestStatus.REJECTED, "no soportamos la marca SAMSUNG");
+async function reject(requestId, reason, user){
+  const request = await _updateStatus(rejectRequest, user.id, requestId, RequestStatus.REJECTED);
+  sendRequestMail(user.mail, user.user_name, RequestStatus.REJECTED, reason, request);
   return request;
 }
 
@@ -72,7 +72,7 @@ async function _updateStatus(actionCallback, userId, requestId, ...params){
     return await findById(requestId);
   }
   else {
-    console.log(`Invalid status ${request.status} for Request ID ${requestId} for current operation`);
+    console.log(`ERROR: Invalid status ${request.status} for Request ID ${requestId} for current operation`);
     throw new RequetInvalidStatusError(requestId, request.status)
   }
 }
@@ -84,7 +84,7 @@ async function _find(requestId, userId){
     return request;
   }
   else{
-    console.log(`Request ${requestId} not found for User Id ${userId}`);
+    console.log(`ERROR: Request ${requestId} not found for User Id ${userId}`);
     throw new RequestNotFoundError(requestId, userId)
   }
 }
@@ -153,7 +153,7 @@ async function _awsAddStationRequest(url, options, requestId){
       case 200:
         return awsJson;
       default:
-        console.log(`An unexpected error occured while adding station for Request Id ${requestId} to AWS. \n Error: ${userJson}`);
+        console.log(`ERROR: An unexpected error occured while adding station for Request Id ${requestId} to AWS. \n Error: ${userJson}`);
         throw new AwsUnexpectedError(requestId);
     }
   } 
@@ -161,7 +161,7 @@ async function _awsAddStationRequest(url, options, requestId){
     if (error instanceof AwsUnexpectedError) {
       throw error;
     } else {
-      console.log(`An error occured whie requesting User Id ${requestId}. \n Error: ${error}`);
+      console.log(`ERROR: An error occured whie requesting User Id ${requestId}. \n Error: ${error}`);
       throw new AwsRequestError(requestId);
     }
   }

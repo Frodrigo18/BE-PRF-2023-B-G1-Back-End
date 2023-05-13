@@ -22,10 +22,9 @@ async function accept(userId, adminUserId, requestId, userToken){
 
 }
 
-async function reject(userId, requestId, userToken){
-  await findUser(userId, userToken);
-
-  const request = await rejectRequest(requestId, userId);
+async function reject(userId, requestId, body, userToken){
+  const user = await findUser(userId, userToken);
+  const request = await rejectRequest(requestId, body.reason, user);
   return request;
 }
 

@@ -1,81 +1,167 @@
+<!DOCTYPE html>
 <html>
-    <head>
-      <link href="https://fonts.googleapis.com/css?family=Open+Sans|Lato&display=swap" rel="stylesheet">
-      <style>
-        body {
-          font-family: 'Open Sans', sans-serif;
-          font-size: 18px;
-        }
+  <head>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    color: #333;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+  }
 
-        h1 {
-          font-size: 36px;
-          font-family: 'Lato', sans-serif;
-        }
-        body {
-          font-family: Arial, sans-serif;
-          color: #333;
-          background-color: #f4f4f4;
-          margin: 0;
-          padding: 0;
-        }
-        .header {
-          background-color: #000;
-          color: #fff;
-          padding: 20px;
-          text-align: center;
-        }
-        .message {
-          background-color: #fff;
-          padding: 20px;
-          border-radius: 10px;
-          box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
-          margin-top: 20px;
-          height: 400px;
-          text-align: center;
-        }
-        .footer {
-          background-color: #000;
-          color: #fff;
-          padding: 10px;
-          text-align: center;
-        }
-      </style>
-    </head>
-    <body>
-      <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
-        <tr>
-          <td>
-            <table align="center" border="0" cellpadding="0" cellspacing="0" width="700">
-              <tr>
-                <td>
-                  <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
-                    <tr>
-                      <td class="header">
-                        <h1>Estado de su solicitud</h1>
-                      </td>
-                    </tr>
-                  </table>
-                  <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
-                    <tr>
-                      <td class="message">
-                        <p>Estimado/a {{username}},</p>
-                        <p>Le informamos que su solicitud ha sido {{status}}.</p>
-                        <p>{{reason}}</p>
-                        <p>Para más información, por favor, contacte con nosotros.</p>
-                      </td>
-                    </tr>
-                  </table>
-                  <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
-                    <tr>
-                      <td class="footer">
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
-    </body>
-  </html>
+  h1 {
+    font-size: 36px;
+    font-family: Georgia, serif;
+  }
+
+  .header {
+    background-color: #000;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .message {
+    background-color: #fff;
+    font-family: Verdana, sans-serif;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+    margin-top: 20px;
+    height: 400px;
+    text-align: center;
+  }
+
+  .footer {
+    background-color: #000;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .button {
+    background-color: #000;
+    color: #fff;
+    border-radius: 5px;
+    padding: 10px 20px;
+    display: inline-block;
+    text-decoration: none;
+    margin-top: 20px;
+  }
+  
+  .button:hover {
+  background-color: #333;
+  color: #fff;
+}
+
+.button:active {
+  background-color: #555;
+  color: #fff;
+  box-shadow: 0 5px #333;
+  transform: translateY(4px);
+}
+
+table {
+	  margin: 0 auto;
+    border-collapse: collapse;
+  }
+  
+  a{
+	color: #fff;
+  }
+
+  td, th {
+    border: 0px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+
+  th {
+    background-color: #f2f2f2;
+  }
+
+  .details {
+    border: 2px solid #dddddd;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 10px;
+  }
+
+  .details td, .details th {
+    border: 1px solid #dddddd;
+    padding: 5px;
+  }
+
+  .details th {
+    background-color: #f2f2f2;
+  }
+</style>
+    <title>Estado de su solicitud</title>
+  </head>
+  <body>
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr>
+        <td>
+          <table align="center" border="0" cellpadding="0" cellspacing="0" width="700">
+            <tr>
+              <td>
+                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td class="header">
+                      <h1>Estado de su solicitud</h1>
+                    </td>
+                  </tr>
+                </table>
+                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td class="message">
+                      <p>Estimado/a {{username}},</p>
+                      <p>Le informamos que su solicitud ha sido {{status}}.</p>
+                      <p>{{reason}}</p>
+                      <p>A continuación, encontrará los detalles de la solicitud:</p>
+                      <table class="details">
+                        <tr>
+                          <td>Nombre:</td>
+                          <td>{{name}}</td>
+                        </tr>
+                        <tr>
+                          <td>Número de Serie:</td>
+                          <td>{{serial_number}}</td>
+                        </tr>
+                        <tr>
+                          <td>Longitud:</td>
+                          <td>{{longitude}}</td>
+                        </tr>
+                        <tr>
+                          <td>Latitud:</td>
+                          <td>{{latitude}}</td>
+                        </tr>
+                        <tr>
+                          <td>Marca:</td>
+                          <td>{{brand}}</td>
+                        </tr>
+                        <tr>
+                          <td>Modelo:</td>
+                          <td>{{model}}</td>
+                        </tr>
+                      </table>
+                      <a class="button" href="http://localhost:3000" style="color: white;">Ver solicitud</a>
+                    </td>
+                  </tr>
+                </table>
+                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td class="footer">
+                      <p>&copy; {{year}} respirAR</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

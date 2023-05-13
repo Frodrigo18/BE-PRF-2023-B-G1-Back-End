@@ -2,24 +2,30 @@ import nodemailer from 'nodemailer';
 import dotenv from "dotenv";
 import fs from 'fs';
 import { RequestStatus } from '../model/enum/requestStatus.js';
-import path from 'path';
 
 dotenv.config();
 
-async function sendMail(toMail, username, status, reason) {
+async function sendRequestMail(toMail, username, status, reason, request) {
   try {
+    const year = new Date().getFullYear();
+    const statusMail = status == RequestStatus.APPROVED ? "aprobada" : "rechazada"
     const html = fs.readFileSync('/app/html/mail.html', 'utf-8');
-
-    const customHtml = html
+    const auxCustomHtml = html
         .replace('{{username}}', username)
-        .replace('{{status}}', status == RequestStatus.APPROVED ? "aprobada" : "rechazada")
+        .replace('{{status}}', statusMail)
+        .replace('{{year}}', year)
+        .replace('{{name}}', request.name)
+        .replace('{{serial_number}}', request.serial_number)
+        .replace('{{longitude}}', request.longitud)
+        .replace('{{latitude}}', request.latitude)
+        .replace('{{brand}}', request.brand)
+        .replace('{{model}}', request.model)
     
+    let customHtml = ''
     if (reason){
-        customHtml
-            .replace('{{reason}}', `La razon es la siguiente: ${reason}`);
+      customHtml = auxCustomHtml.replace('{{reason}}', `La razon es la siguiente: ${reason}`);
     }else{
-        customHtml
-            .replace('{{reason}}', '');
+      customHtml = auxCustomHtml.replace('{{reason}}', '');
     }
 
     let transporter = nodemailer.createTransport({
@@ -36,16 +42,13 @@ async function sendMail(toMail, username, status, reason) {
     let mailOptions = {
         from:  process.env.GOOGLE_MAIL,
         to: toMail,
-        subject: 'Asunto del correo',
+        subject: `Su solicitud ha sido ${statusMail.toUpperCase()}`,
         html: customHtml
     };
       
-
-    let info = await transporter.sendMail(mailOptions);
-    console.log('Correo electrónico enviado: ' + info.response);
   } catch (error) {
-    console.log(error);
+    console.log(`ERROR: An unexpected error occured while sending Request Mail. Error: ${error}`);
   }
 }
 
-export {sendMail}
+export {sendRequestMail}
