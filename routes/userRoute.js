@@ -103,7 +103,7 @@ router.patch("/:userId/requests/:requestId/reject", [authAdmin], async function 
   res.status(statusCode).json(responseJson);
 });
 
-router.patch("/:stationId/suspend", [authSelf], async function (req, res, next){
+router.patch("/:userId/stations/:stationId/suspend", [authSelf], async function (req, res, next){
   let responseJson = ""
   let statusCode = 200
 

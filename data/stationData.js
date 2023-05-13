@@ -12,10 +12,14 @@ async function findBySerialNumber(serialNumber) {
   return await find(filter);
 }
 
-async function findById(id) {
+async function findById(id){
   const objectId = createObjectId(id);
-  const filter = { _id: objectId };
-  return await find(filter);
+  const clientMongo = await getConnection();
+  const result = await clientMongo
+    .db(DB)
+    .collection(STATIONS)
+    .findOne({_id: objectId})
+return result;
 }
 
 async function find(filter) {

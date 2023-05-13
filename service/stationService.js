@@ -27,9 +27,9 @@ async function add(request, userId) {
 
 async function suspend(userId, stationId, rol){
     const stationToSuspend = await findById(stationId);
-    
+
     if (!stationToSuspend) {
-        throw new StationNotFoundError(stationId);
+        throw new StationNotFoundError(stationId);  
     }
 
     if (stationToSuspend.created_by !== userId && rol === Rol.USER) {
