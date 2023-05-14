@@ -13,7 +13,7 @@ async function add(request, userid) {
     const fullRequest = {
       serial_number: request.serial_number,
       name: request.name,
-      longitud: request.longitud,
+      longitude: request.longitude,
       latitude: request.latitude,
       brand: request.brand,
       model: request.model,

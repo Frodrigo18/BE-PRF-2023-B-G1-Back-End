@@ -19,8 +19,11 @@ async function get(filterRequests) {
 }
 
 async function getByUser(filterRequests, userToken, userId) {
+  console.log(`INFO: Starting get requests for User Id ${userId}`)
   await findUser(userId, userToken);
-  return await get(filterRequests);
+  const requests = await get(filterRequests);
+  console.log(`INFO: Get requests for User Id ${userId} finished successfully`)
+  return requests;
 }
 
 async function accept(userId, adminUserId, requestId, userToken) {

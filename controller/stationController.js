@@ -18,8 +18,11 @@ async function get(filterStations) {
 }
 
 async function getByUser(filterStations, userToken, userId) {
+  console.log(`INFO: Starting get stations for User Id ${userId}`)
   await findUser(userId, userToken);
-  return await get(filterStations);
+  const stations = await get(filterStations);
+  console.log(`INFO: Get stations for User Id ${userId} finishes successfully`)
+  return stations;
 }
 
 async function rename(userId, stationsId, userToken, rol, body){
