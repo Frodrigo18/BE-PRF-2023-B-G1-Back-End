@@ -1,9 +1,5 @@
 import { findUser } from "../service/userService.js";
-import {
-  add as addRequest,
-  accept as acceptRequest,
-  reject as rejectRequest,
-} from "../service/requestService.js";
+import { add as addRequest, accept as acceptRequest, reject as rejectRequest } from "../service/requestService.js";
 import { get as getRequests } from "../service/requestService.js";
 
 async function add(body, userid, userToken) {
@@ -22,6 +18,11 @@ async function get(filterRequests) {
   return requests;
 }
 
+async function getByUser(filterRequests, userToken, userId) {
+  await findUser(userId, userToken);
+  return await get(filterRequests);
+}
+
 async function accept(userId, adminUserId, requestId, userToken) {
   console.log(`INFO: Starting accept request for User Id ${userId}`)
   const user = await findUser(userId, userToken);
@@ -37,4 +38,4 @@ async function reject(userId, requestId, body, userToken){
   return request;
 }
 
-export { add, get, accept, reject };
+export { add, get, accept, reject, getByUser };

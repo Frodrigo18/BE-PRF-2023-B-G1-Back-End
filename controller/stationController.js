@@ -17,6 +17,11 @@ async function get(filterStations) {
   return stations;
 }
 
+async function getByUser(filterStations, userToken, userId) {
+  await findUser(userId, userToken);
+  return await get(filterStations);
+}
+
 async function rename(userId, stationsId, userToken, rol, body){
   console.log(`INFO: Starting renaming station for User Id ${userId}`)
   await findUser(userId, userToken);
@@ -25,4 +30,4 @@ async function rename(userId, stationsId, userToken, rol, body){
   return station;
 }
 
-export {suspend, get, rename}
+export {suspend, get, rename, getByUser }
