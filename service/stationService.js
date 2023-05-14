@@ -1,7 +1,13 @@
-import { findBySerialNumber, create, findById,findAll, update } from "../data/stationData.js";
+import {
+  findBySerialNumber,
+  create,
+  findById,
+  findAll,
+  update,
+} from "../data/stationData.js";
 import { Rol } from "../model/enum/rol.js";
-import {StationStatus} from "../model/enum/stationStatus.js"
-import {StationNotFoundError} from "./error/stationNotFoundError.js"
+import { StationStatus } from "../model/enum/stationStatus.js";
+import { StationNotFoundError } from "./error/stationNotFoundError.js";
 
 async function exists(serialNumber) {
   const station = await findBySerialNumber(serialNumber);
@@ -25,32 +31,32 @@ async function add(request, userId) {
   return await findById(newStation.insertedId);
 }
 
-async function suspend(userId, stationId, rol){
-    const stationToSuspend = await findById(stationId);
+async function suspend(userId, stationId, rol) {
+  const stationToSuspend = await findById(stationId);
 
-    if (!stationToSuspend) {
-        throw new StationNotFoundError(stationId);  
-    }
+  if (!stationToSuspend) {
+    throw new StationNotFoundError(stationId);
+  }
 
-    if (stationToSuspend.created_by !== userId && rol === Rol.USER) {
-        throw new StationNotFoundError(stationId);
-    }
+  if (stationToSuspend.created_by !== userId && rol === Rol.USER) {
+    throw new StationNotFoundError(stationId);
+  }
 
-    if (stationToSuspend.status !== StationStatus.ACTIVE) {
-        throw new StationNotFoundError(stationId);
-    }
-    
-    stationToSuspend.status = StationStatus.INACTIVE;
-    await update(stationId, stationToSuspend);
+  if (stationToSuspend.status !== StationStatus.ACTIVE) {
+    throw new StationNotFoundError(stationId);
+  }
 
-    const suspendedStation = await findById(stationId);
+  stationToSuspend.status = StationStatus.INACTIVE;
+  await update(stationId, stationToSuspend);
 
-    return suspendedStation;
+  const suspendedStation = await findById(stationId);
+
+  return suspendedStation;
 }
 
-async function get(filterRequests) {
-    const request = await findAll(filterRequests);
-    return request;
-  }
+async function get(filterStation) {
+  const stations = await findAll(filterStation);
+  return stations;
+}
 
 export { exists, add, suspend, get };

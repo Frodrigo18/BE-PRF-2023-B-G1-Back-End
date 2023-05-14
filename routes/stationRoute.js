@@ -27,7 +27,8 @@ router.get(
       queryName,
       querySerialNumber,
       queryStatus,
-      queryDate
+      queryDate,
+      null
     );
 
     try {

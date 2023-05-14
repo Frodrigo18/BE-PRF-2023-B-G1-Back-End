@@ -12,14 +12,14 @@ async function findBySerialNumber(serialNumber) {
   return await find(filter);
 }
 
-async function findById(id){
+async function findById(id) {
   const objectId = createObjectId(id);
   const clientMongo = await getConnection();
   const result = await clientMongo
     .db(DB)
     .collection(STATIONS)
-    .findOne({_id: objectId})
-return result;
+    .findOne({ _id: objectId });
+  return result;
 }
 
 async function find(filter) {
@@ -46,48 +46,51 @@ async function update(id, station) {
   const updateDoc = { $set: station };
   const clientMongo = await getConnection();
   const result = await clientMongo
-      .db(DB)
-      .collection(STATIONS)
-      .updateOne(filter, updateDoc);
+    .db(DB)
+    .collection(STATIONS)
+    .updateOne(filter, updateDoc);
   return result;
 }
 
 async function findAll(filterStation) {
-const filter = {};
+  const filter = {};
 
-if (filterStation.name) {
-  filter.name = filterStation.name;
+  if (filterStation.name) {
+    filter.name = filterStation.name;
+  }
+  if (filterStation.serialNumber) {
+    filter.serial_number = filterStation.serialNumber;
+  }
+  if (filterStation.status) {
+    filter.status = filterStation.status;
+  }
+  if (filterStation.date) {
+    const gte = new Date(filterStation.date);
+    const lt = new Date(gte.getTime() + 24 * 60 * 60 * 1000);
+
+    filter.created_at = {
+      $gte: gte,
+      $lt: lt,
+    };
+  }
+  if (filterStation.userId) {
+    filter.created_by = filterStation.userId;
+  }
+
+  const clientMongo = await getConnection();
+
+  const skip = filterStation.pageSize * filterStation.page;
+  let limit = filterStation.pageSize;
+
+  const result = await clientMongo
+    .db(DB)
+    .collection(STATIONS)
+    .find(filter)
+    .limit(limit)
+    .skip(skip)
+    .toArray();
+
+  return result;
 }
-if (filterStation.serialNumber) {
-  filter.serial_number = filterStation.serialNumber;
-}
-if (filterStation.status) {
-  filter.status = filterStation.status;
-}
-if (filterStation.date) {
-  const gte = new Date(filterStation.date);
-  const lt = new Date(gte.getTime() + 24 * 60 * 60 * 1000);
 
-  filter.created_at = {
-    $gte: gte,
-    $lt: lt,
-  };
-}
-
-const clientMongo = await getConnection();
-
-const skip = filterStation.pageSize * filterStation.page;
-let limit = filterStation.pageSize;
-
-const result = await clientMongo
-  .db(DB)
-  .collection(STATIONS)
-  .find(filter)
-  .limit(limit)
-  .skip(skip)
-  .toArray();
-
-return result;
-}
-
-export {findBySerialNumber, create, findById, findAll, update}
+export { findBySerialNumber, create, findById, findAll, update };
