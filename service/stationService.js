@@ -6,8 +6,11 @@ import {
   update,
 } from "../data/stationData.js";
 import { Rol } from "../model/enum/rol.js";
-import { StationStatus } from "../model/enum/stationStatus.js";
-import { StationNotFoundError } from "./error/stationNotFoundError.js";
+import { StationStatus } from "../model/enum/stationStatus.js"
+import { StationNotFoundError } from "./error/stationNotFoundError.js"
+import { suspendAwsThing, alterAwsThing } from "./awsService.js";
+import { StationAlreadyExistsError } from "./error/stationAlreadyExistsError.js";
+
 
 async function exists(serialNumber) {
   const station = await findBySerialNumber(serialNumber);
@@ -15,48 +18,79 @@ async function exists(serialNumber) {
 }
 
 async function add(request, userId) {
-  const fullStation = {
-    serial_number: request.serial_number,
-    name: request.name,
-    longitud: request.longitud,
-    latitud: request.latitud,
-    brand: request.brand,
-    model: request.model,
-    status: StationStatus.ACTIVE,
-    created_by: parseInt(userId),
-    created_at: new Date(),
-  };
+  const station = await findBySerialNumber(request.serial_number);
 
-  const newStation = await create(fullStation);
-  return await findById(newStation.insertedId);
+  if (!station){
+    const fullStation = {
+      serial_number: request.serial_number,
+      name: request.name,
+      longitud: request.longitud,
+      latitud: request.latitude,
+      brand: request.brand,
+      model: request.model,
+      status: StationStatus.ACTIVE,
+      created_by: parseInt(userId),
+      created_at: new Date(),
+    };
+  
+    const newStation = await create(fullStation);
+    return await findById(newStation.insertedId);
+  }
+  else if (station.status == StationStatus.ACTIVE){
+    console.log(`ERROR: Station serial number ${request.serial_number} already exists`);
+    throw StationAlreadyExistsError(request.serial_number)
+  }
+  else{
+    station.status = StationStatus.ACTIVE
+    await update(station._id, station);
+    return station;
+  }
 }
 
-async function suspend(userId, stationId, rol) {
-  const stationToSuspend = await findById(stationId);
-
-  if (!stationToSuspend) {
-    throw new StationNotFoundError(stationId);
-  }
-
-  if (stationToSuspend.created_by !== userId && rol === Rol.USER) {
-    throw new StationNotFoundError(stationId);
-  }
-
-  if (stationToSuspend.status !== StationStatus.ACTIVE) {
-    throw new StationNotFoundError(stationId);
-  }
-
+async function suspend(userId, stationId, rol){
+  const stationToSuspend = await _stationVerification(userId, stationId, rol);
+  await suspendAwsThing(stationToSuspend);
+  
   stationToSuspend.status = StationStatus.INACTIVE;
   await update(stationId, stationToSuspend);
 
-  const suspendedStation = await findById(stationId);
-
-  return suspendedStation;
+  return stationToSuspend;
 }
 
-async function get(filterStation) {
-  const stations = await findAll(filterStation);
-  return stations;
+async function get(filterStations) {
+  const station = await findAll(filterStations);
+  return station;
 }
 
-export { exists, add, suspend, get };
+async function rename(userId, stationId, rol, newName){
+  const station = await _stationVerification(userId, stationId, rol);
+  
+  await alterAwsThing(station);
+  station.name = newName;
+  await update(stationId, station);
+
+  return station;
+}
+
+async function _stationVerification(userId, stationId, rol){
+  const station = await findById(stationId);
+
+  if (!station) {
+    console.log(`ERROR: Station Id ${stationId} not found`);
+    throw new StationNotFoundError(stationId);  
+  }
+
+  if (station.created_by !== userId && rol === Rol.USER) {
+    console.log(`ERROR: Station Id ${stationId} does not belong to User Id ${userId}`);
+    throw new StationNotFoundError(stationId);
+  }
+
+  if (station.status !== StationStatus.ACTIVE) {
+    console.log(`ERROR: Station Id ${stationId} is not in state ${StationStatus.ACTIVE}`);
+    throw new StationNotFoundError(stationId);
+  }
+
+  return station
+}
+
+export { exists, add, suspend, get, rename };

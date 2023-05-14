@@ -32,7 +32,7 @@ async function findUser(userid, userToken) {
     if (error instanceof UserNotFoundError || error instanceof UserUnexpectedError) {
       throw error;
     } else {
-      console.log(`An error occured whie requesting User Id ${userid}. \n Error: ${error}`);
+      console.log(`An error occured while requesting User Id ${userid}. \n Error: ${error}`);
       throw new UserRequestError(userid);
     }
   }

@@ -27,7 +27,7 @@ async function find(filter) {
   const station = await connection
     .db(DB)
     .collection(STATIONS)
-    .findOne({ filter });
+    .findOne(filter);
   return station;
 }
 
@@ -74,7 +74,7 @@ async function findAll(filterStation) {
     };
   }
   if (filterStation.userId) {
-    filter.created_by = filterStation.userId;
+    filter.created_by = parseInt(filterStation.userId);
   }
 
   const clientMongo = await getConnection();
