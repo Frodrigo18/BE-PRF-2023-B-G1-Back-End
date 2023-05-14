@@ -2,7 +2,7 @@ import { suspend as suspendStation, rename as renameStation } from "../service/s
 import { get as getStations } from "../service/stationService.js";
 import { findUser } from "../service/userService.js";
 
-async function suspend(userId, stationId, rol, userToken){
+async function suspend(userId, stationId, rol, userToken) {
   await findUser(userId, userToken);
   const station = await suspendStation(userId, stationId, rol);
   return station;

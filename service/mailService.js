@@ -45,8 +45,9 @@ async function sendRequestMail(toMail, username, status, reason, request) {
         subject: `Su solicitud ha sido ${statusMail.toUpperCase()}`,
         html: customHtml
     };
-
-    await transporter.sendMail(mailOptions);
+    
+    console.log("sending")
+    const info = await transporter.sendMail(mailOptions);
   } catch (error) {
     console.log(error);
   }

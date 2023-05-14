@@ -11,40 +11,46 @@ import { RequestInvalidStatusError } from "../service/error/requestInvalidStatus
 import { UserRequestError } from "../service/error/userRequestError.js";
 import { AwsRequestError } from "../service/error/awsRequestError.js";
 import { AwsUnexpectedError } from "../service/error/awsUnexpectedError.js";
-import { rename, suspend } from "../controller/stationController.js";
+import { rename, suspend, get as getStations, } from "../controller/stationController.js";
 import { StationNotFoundError } from "../service/error/stationNotFoundError.js";
 import { renameStationValidator } from "../middleware/validator/body/renameStationValidator.js"
+import { validatorStatus } from "../middleware/validator/params/stationValidator.js";
+import { validatorDate } from "../middleware/validator/params/dateValidator.js";
+import { FilterStation } from "../model/filterStation.js";
 
 const router = express.Router();
 
-router.post("/:userId/requests", [auth, authSelf, addRequestValidator], async function (req, res, next) {
-  let responseJson = ""
-  let statusCode = 201
+router.post(
+  "/:userId/requests",
+  [auth, authSelf, addRequestValidator],
+  async function (req, res, next) {
+    let responseJson = "";
+    let statusCode = 201;
 
-  try {
-    const body = req.body;
-    const userId = req.params.userId;
-    const userToken = req.header("Authorization");
-    responseJson = await add(body, userId, userToken);
+    try {
+      const body = req.body;
+      const userId = req.params.userId;
+      const userToken = req.header("Authorization");
+      responseJson = await add(body, userId, userToken);
+    } catch (error) {
+      responseJson = { message: error.message };
 
-  } catch (error) {
-    responseJson = {message: error.message}
-
-    if (error instanceof UserNotFoundError){
-      statusCode = 404
+      if (error instanceof UserNotFoundError) {
+        statusCode = 404;
+      } else if (error instanceof StationAlreadyExistsError) {
+        statusCode = 409;
+      } else if (
+        error instanceof UserUnexpectedError ||
+        error instanceof UserRequestError
+      ) {
+        statusCode = 500;
+      } else {
+        statusCode = 500;
+      }
     }
-    else if (error instanceof StationAlreadyExistsError){
-      statusCode = 409
-    }
-    else if (error instanceof UserUnexpectedError || error instanceof UserRequestError){
-      statusCode = 500
-    }
-    else {
-      statusCode = 500
-    }
+    res.status(statusCode).json(responseJson);
   }
-  res.status(statusCode).json(responseJson);
-});
+);
 
 router.patch("/:userId/requests/:requestId/accept", [authAdmin], async function (req, res, next){
   let responseJson = ""
@@ -104,18 +110,20 @@ router.patch("/:userId/requests/:requestId/reject", [authAdmin, rejectRequestVal
   res.status(statusCode).json(responseJson);
 });
 
-router.patch("/:userId/stations/:stationId/suspend", [authSelf], async function (req, res, next){
-  let responseJson = ""
-  let statusCode = 200
+router.patch(
+  "/:userId/stations/:stationId/suspend",
+  [authSelf],
+  async function (req, res, next) {
+    let responseJson = "";
+    let statusCode = 200;
 
-  try {
+    try {
       const userId = req.params.userId;
       const stationId = req.params.stationId;
       const userToken = req.header("Authorization");
 
       responseJson = await suspend(userId, stationId, req.rol, userToken);
-
-  } catch (error) {
+    } catch (error) {
       responseJson = { message: error.message };
       if (error instanceof StationNotFoundError || error instanceof UserNotFoundError){
           statusCode = 404;
@@ -128,7 +136,42 @@ router.patch("/:userId/stations/:stationId/suspend", [authSelf], async function 
       }
     }
     res.status(statusCode).json(responseJson);
-});
+  }
+);
+
+router.get(
+  "/:userId/stations",
+  [authSelf, validatorStatus, validatorDate],
+  async function (req, res, next) {
+    const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 0;
+    const page = req.query.page ? parseInt(req.query.page) : 0;
+    const queryName = req.query.name;
+    const querySerialNumber = req.query.serialNumber;
+    const queryStatus = req.query.status;
+    const queryDate = req.query.date;
+    const userId = req.params.userId;
+
+    let responseJson = "";
+    let statusCode = 200;
+
+    const filterStation = new FilterStation(
+      pageSize,
+      page,
+      queryName,
+      querySerialNumber,
+      queryStatus,
+      queryDate,
+      userId
+    );
+
+    try {
+      responseJson = await getStations(filterStation);
+    } catch (error) {
+      responseJson = { message: error.message };
+    }
+    res.status(statusCode).json(responseJson);
+  }
+);
 
 router.patch("/:userId/stations/:stationId/rename", [authSelf, renameStationValidator], async function(req, res, next){
   let responseJson = ""

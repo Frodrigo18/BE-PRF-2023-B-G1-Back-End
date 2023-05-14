@@ -1,4 +1,10 @@
-import { findBySerialNumber, create, findById,findAll, update } from "../data/stationData.js";
+import {
+  findBySerialNumber,
+  create,
+  findById,
+  findAll,
+  update,
+} from "../data/stationData.js";
 import { Rol } from "../model/enum/rol.js";
 import { StationStatus } from "../model/enum/stationStatus.js"
 import { StationNotFoundError } from "./error/stationNotFoundError.js"
