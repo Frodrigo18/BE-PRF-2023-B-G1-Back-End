@@ -167,7 +167,7 @@ router.get(
     );
 
     try {
-      responseJson = await getRequests(filterRequest, userId, userToken);
+      responseJson = await getRequests(filterRequest, userToken, userId);
     } catch (error) {
       responseJson = { message: error.message };
       if (error instanceof UserNotFoundError) {
@@ -212,7 +212,7 @@ router.get(
     );
 
     try {
-      responseJson = await getStations(filterStation, userId, userToken);
+      responseJson = await getStations(filterStation, userToken, userId);
     } catch (error) {
       responseJson = { message: error.message };
       if (error instanceof UserNotFoundError) {

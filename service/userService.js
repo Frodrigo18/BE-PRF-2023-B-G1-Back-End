@@ -7,6 +7,7 @@ import { UserRequestError } from "./error/userRequestError.js"
 dotenv.config();
 
 async function findUser(userid, userToken) {
+  console.log(`INFO: Finding User Id ${userid}`)
   const url = `${process.env.USER_HOST}/users/${userid}`;
   const headers = {
     'Authorization': userToken,

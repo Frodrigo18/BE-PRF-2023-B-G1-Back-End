@@ -18,13 +18,14 @@ async function exists(serialNumber) {
 }
 
 async function add(request, userId) {
+  console.log(`INFO: Adding station serial number ${request.serial_number}`)
   const station = await findBySerialNumber(request.serial_number);
 
   if (!station){
     const fullStation = {
       serial_number: request.serial_number,
       name: request.name,
-      longitud: request.longitud,
+      longitude: request.longitude,
       latitud: request.latitude,
       brand: request.brand,
       model: request.model,
@@ -34,6 +35,7 @@ async function add(request, userId) {
     };
   
     const newStation = await create(fullStation);
+    console.log(`INFO: Adding station serial number ${request.serial_number} finishes successfully`)
     return await findById(newStation.insertedId);
   }
   else if (station.status == StationStatus.ACTIVE){
@@ -43,31 +45,41 @@ async function add(request, userId) {
   else{
     station.status = StationStatus.ACTIVE
     await update(station._id, station);
+    console.log(`INFO: Adding station serial number ${request.serial_number} finishes successfully`)
     return station;
   }
 }
 
 async function suspend(userId, stationId, rol){
+  console.log(`INFO: Suspending station for User Id ${userId}`)
   const stationToSuspend = await _stationVerification(userId, stationId, rol);
   await suspendAwsThing(stationToSuspend);
   
   stationToSuspend.status = StationStatus.INACTIVE;
+
+  console.log(`INFO: Updating station status for User Id ${userId}`)
   await update(stationId, stationToSuspend);
+  console.log(`INFO: Updating station status for User Id ${userId} finished successfully`)
 
   return stationToSuspend;
 }
 
 async function get(filterStations) {
+  console.log(`INFO: Getting stations`)
   const station = await findAll(filterStations);
   return station;
 }
 
 async function rename(userId, stationId, rol, newName){
+  console.log(`INFO: Renaming station for User Id ${userId}`)
   const station = await _stationVerification(userId, stationId, rol);
   
   await alterAwsThing(station);
   station.name = newName;
+
+  console.log(`INFO: Updating station name for User Id ${userId}`)
   await update(stationId, station);
+  console.log(`INFO: Updating station name for User Id ${userId} finished successfully`)
 
   return station;
 }

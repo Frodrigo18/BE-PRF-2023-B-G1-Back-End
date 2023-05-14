@@ -9,17 +9,19 @@ const AWS_HOST = process.env.AWS_STF_HOST
 
 async function alterAwsThing(station) {
     console.log(`INFO: Altering AWS Thing`);
-    return await _createAwsThing(station);
+    const response = await _createAwsThing(station);
+    console.log(`INFO: Altering AWS Thing finished successfully`);
+    return response;
 }
 
 async function createAwsIoT(request) {
     console.log(`INFO: Creating AWS IoT`);
     await _createAwsThing(request);
     await _createAwsEntity(request);
+    console.log(`INFO: Creating AWS IoT finished successfuly`);
 }
 
 async function _createAwsThing(thing) {
-    console.log(`INFO: Sending request to AWS to add thing`)
     const url = `${AWS_HOST}/iot/things`;
     const body = {
         id: `urn:ngsi-ld:Device:${thing.name}`,
@@ -51,7 +53,6 @@ async function _createAwsThing(thing) {
 }
 
 async function _createAwsEntity(entity) {
-    console.log(`INFO: Sending request to AWS to add entity`)
     const url = `${AWS_HOST}/ngsi-ld/v1/entities`;
     const body = {
         id: `urn:ngsi-ld:Device:${entity.name}`,
@@ -77,6 +78,7 @@ async function suspendAwsThing(station) {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' }
     };
+    console.log(`INFO: Sending request to AWS to suspend Station Id ${station._id} finished successfully`)
     return await _awsRequest(url, options)
 }
 
