@@ -9,6 +9,7 @@ import { sendRequestMail } from "./mailService.js";
 import { createAwsIoT } from "./awsService.js";
 
 async function add(request, userid) {
+  console.log(`INFO: Adding request by User Id ${userid}`)
   if (!(await existsStation(request.serial_number)) && !(await _exist(request.serial_number))) {
     const fullRequest = {
       serial_number: request.serial_number,
@@ -40,11 +41,13 @@ async function _exist(serialNumber){
 }
 
 async function get(filterRequests) {
+  console.log(`INFO: Getting requests`)
   const request = await findAll(filterRequests);
   return request;  
 }
 
 async function accept(requestId, user, userAdminId){
+  console.log(`INFO: Accepting request for User Id ${user.id}`)
   const request = await _find(requestId, user.id);
   await createAwsIoT(request);
   const updatedRequest = await _updateStatus(approvedRequest, user.id, requestId, userAdminId, RequestStatus.APPROVED);
@@ -54,12 +57,14 @@ async function accept(requestId, user, userAdminId){
 }
 
 async function reject(requestId, reason, user){
+  console.log(`INFO: Rejecting request for User Id ${user.id}`)
   const request = await _updateStatus(rejectRequest, user.id, requestId, RequestStatus.REJECTED);
   sendRequestMail(user.mail, user.user_name, RequestStatus.REJECTED, reason, request);
   return request;
 }
 
 async function _updateStatus(actionCallback, userId, requestId, ...params){
+  console.log(`INFO: Updating state for Request Id ${requestId}`)
   const request = await _find(requestId, userId);
 
   if (request.status == RequestStatus.PENDING){

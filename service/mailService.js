@@ -46,10 +46,11 @@ async function sendRequestMail(toMail, username, status, reason, request) {
         html: customHtml
     };
     
-    console.log("sending")
+    console.log(`INFO: Sending mail to ${toMail}`)
     const info = await transporter.sendMail(mailOptions);
+    console.log(`INFO: Sending mail to ${toMail} finished successfully`)
   } catch (error) {
-    console.log(error);
+    console.log(`ERROR: Un unexpected error occured while sending mail to  ${toMail}. Error: ${error}`);
   }
 }
 
