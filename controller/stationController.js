@@ -13,10 +13,15 @@ async function get(filterStations) {
   return stations;
 }
 
+async function getByUser(filterStations, userToken, userId) {
+  await findUser(userId, userToken);
+  return await get(filterStations);
+}
+
 async function rename(userId, stationsId, userToken, rol, body){
   await findUser(userId, userToken);
   const station = await renameStation(userId, stationsId, rol, body.name);
   return station;
 }
 
-export {suspend, get, rename}
+export {suspend, get, rename, getByUser }

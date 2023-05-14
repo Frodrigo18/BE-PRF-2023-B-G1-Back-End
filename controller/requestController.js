@@ -14,6 +14,11 @@ async function get(filterRequests) {
   return requests;
 }
 
+async function getByUser(filterRequests, userToken, userId) {
+  await findUser(userId, userToken);
+  return await get(filterRequests);
+}
+
 async function accept(userId, adminUserId, requestId, userToken) {
   const user = await findUser(userId, userToken);
   const request = await acceptRequest(requestId, user, adminUserId);
@@ -26,4 +31,4 @@ async function reject(userId, requestId, body, userToken){
   return request;
 }
 
-export { add, get, accept, reject };
+export { add, get, accept, reject, getByUser };
