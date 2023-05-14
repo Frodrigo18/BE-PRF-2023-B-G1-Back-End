@@ -27,7 +27,7 @@ async function find(filter) {
   const station = await connection
     .db(DB)
     .collection(STATIONS)
-    .findOne({ filter });
+    .findOne(filter);
   return station;
 }
 
