@@ -14,14 +14,14 @@ async function exists(serialNumber) {
   return station != null && station.status != StationStatus.INACTIVE;
 }
 
-async function add(station, userId) {
+async function add(request, userId) {
   const fullStation = {
-    serial_number: station.serial_number,
-    name: station.name,
-    longitud: station.longitud,
-    latitud: station.latitud,
-    brand: station.brand,
-    model: station.model,
+    serial_number: request.serial_number,
+    name: request.name,
+    longitud: request.longitud,
+    latitud: request.latitud,
+    brand: request.brand,
+    model: request.model,
     status: StationStatus.ACTIVE,
     created_by: parseInt(userId),
     created_at: new Date(),
