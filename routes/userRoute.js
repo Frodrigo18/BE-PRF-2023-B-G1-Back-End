@@ -16,7 +16,8 @@ import { StationNotFoundError } from "../service/error/stationNotFoundError.js";
 import { renameStationValidator } from "../middleware/validator/body/renameStationValidator.js"
 import { validatorStatus } from "../middleware/validator/params/stationValidator.js";
 import { validatorDate } from "../middleware/validator/params/dateValidator.js";
-import { FilterStation, FilterRequest } from "../model/filterStation.js";
+import { FilterStation } from "../model/filterStation.js";
+import { FilterRequests } from "../model/filterRequests.js"
 
 const router = express.Router();
 
@@ -154,7 +155,7 @@ router.get(
     let responseJson = "";
     let statusCode = 200;
 
-    const filterRequest = new FilterRequest(
+    const filterRequest = new FilterRequests(
       pageSize,
       page,
       queryName,

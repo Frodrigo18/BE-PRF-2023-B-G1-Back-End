@@ -59,6 +59,10 @@ async function findAll(filterRequests){
       }
     }
 
+    if (filterRequests.userId) {
+    filter.created_by = parseInt(filterRequests.userId);
+    }
+
     const clientMongo = await getConnection();
 
     const skip = filterRequests.pageSize * filterRequests.page;
