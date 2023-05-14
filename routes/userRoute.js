@@ -1,9 +1,9 @@
 import express from "express";
-import { auth, authAdmin, authSelf, authUser } from "../middleware/auth/auth.js";
+import { auth, authAdmin, authSelf } from "../middleware/auth/auth.js";
 import { addRequestValidator } from "../middleware/validator/body/addRequestValidator.js";
 import { rejectRequestValidator } from "../middleware/validator/body/rejectRequestValidator.js";
 import { UserNotFoundError } from "../service/error/userNotFoundError.js";
-import { add, accept, reject } from "../controller/requestController.js";
+import { add, accept, reject, getByUser as getRequests } from "../controller/requestController.js";
 import { StationAlreadyExistsError } from "../service/error/stationAlreadyExistsError.js";
 import { UserUnexpectedError } from "../service/error/userUnexpectedError.js";
 import { RequestNotFoundError } from "../service/error/requestNotFoundError.js";
@@ -11,12 +11,13 @@ import { RequestInvalidStatusError } from "../service/error/requestInvalidStatus
 import { UserRequestError } from "../service/error/userRequestError.js";
 import { AwsRequestError } from "../service/error/awsRequestError.js";
 import { AwsUnexpectedError } from "../service/error/awsUnexpectedError.js";
-import { rename, suspend, get as getStations, } from "../controller/stationController.js";
+import { rename, suspend, getByUser as getStations } from "../controller/stationController.js";
 import { StationNotFoundError } from "../service/error/stationNotFoundError.js";
 import { renameStationValidator } from "../middleware/validator/body/renameStationValidator.js"
 import { validatorStatus } from "../middleware/validator/params/stationValidator.js";
 import { validatorDate } from "../middleware/validator/params/dateValidator.js";
 import { FilterStation } from "../model/filterStation.js";
+import { FilterRequests } from "../model/filterRequests.js"
 
 const router = express.Router();
 
@@ -140,6 +141,51 @@ router.patch(
 );
 
 router.get(
+  "/:userId/requests",
+  [authSelf, validatorStatus, validatorDate],
+  async function (req, res, next) {
+    const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 0;
+    const page = req.query.page ? parseInt(req.query.page) : 0;
+    const queryName = req.query.name;
+    const querySerialNumber = req.query.serialNumber;
+    const queryStatus = req.query.status;
+    const queryDate = req.query.date;
+    const userId = req.params.userId;
+    const userToken = req.header("Authorization");
+
+    let responseJson = "";
+    let statusCode = 200;
+
+    const filterRequest = new FilterRequests(
+      pageSize,
+      page,
+      queryName,
+      querySerialNumber,
+      queryStatus,
+      queryDate,
+      userId
+    );
+
+    try {
+      responseJson = await getRequests(filterRequest, userId, userToken);
+    } catch (error) {
+      responseJson = { message: error.message };
+      if (error instanceof UserNotFoundError) {
+        statusCode = 404;
+      } else if (
+        error instanceof UserUnexpectedError ||
+        error instanceof UserRequestError
+      ) {
+        statusCode = 500;
+      } else {
+        statusCode = 500;
+      }
+    }
+    res.status(statusCode).json(responseJson);
+  }
+);
+
+router.get(
   "/:userId/stations",
   [authSelf, validatorStatus, validatorDate],
   async function (req, res, next) {
@@ -150,6 +196,7 @@ router.get(
     const queryStatus = req.query.status;
     const queryDate = req.query.date;
     const userId = req.params.userId;
+    const userToken = req.header("Authorization");
 
     let responseJson = "";
     let statusCode = 200;
@@ -165,9 +212,19 @@ router.get(
     );
 
     try {
-      responseJson = await getStations(filterStation);
+      responseJson = await getStations(filterStation, userId, userToken);
     } catch (error) {
       responseJson = { message: error.message };
+      if (error instanceof UserNotFoundError) {
+        statusCode = 404;
+      } else if (
+        error instanceof UserUnexpectedError ||
+        error instanceof UserRequestError
+      ) {
+        statusCode = 500;
+      } else {
+        statusCode = 500;
+      }
     }
     res.status(statusCode).json(responseJson);
   }
