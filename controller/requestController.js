@@ -1,9 +1,5 @@
 import { findUser } from "../service/userService.js";
-import {
-  add as addRequest,
-  accept as acceptRequest,
-  reject as rejectRequest,
-} from "../service/requestService.js";
+import { add as addRequest, accept as acceptRequest, reject as rejectRequest } from "../service/requestService.js";
 import { get as getRequests } from "../service/requestService.js";
 
 async function add(body, userid, userToken) {

@@ -1,9 +1,9 @@
 import express from "express";
-import { auth, authAdmin, authSelf, authUser } from "../middleware/auth/auth.js";
+import { auth, authAdmin, authSelf } from "../middleware/auth/auth.js";
 import { addRequestValidator } from "../middleware/validator/body/addRequestValidator.js";
 import { rejectRequestValidator } from "../middleware/validator/body/rejectRequestValidator.js";
 import { UserNotFoundError } from "../service/error/userNotFoundError.js";
-import { add, accept, reject } from "../controller/requestController.js";
+import { add, accept, reject, get as getRequests } from "../controller/requestController.js";
 import { StationAlreadyExistsError } from "../service/error/stationAlreadyExistsError.js";
 import { UserUnexpectedError } from "../service/error/userUnexpectedError.js";
 import { RequestNotFoundError } from "../service/error/requestNotFoundError.js";
@@ -16,7 +16,7 @@ import { StationNotFoundError } from "../service/error/stationNotFoundError.js";
 import { renameStationValidator } from "../middleware/validator/body/renameStationValidator.js"
 import { validatorStatus } from "../middleware/validator/params/stationValidator.js";
 import { validatorDate } from "../middleware/validator/params/dateValidator.js";
-import { FilterStation } from "../model/filterStation.js";
+import { FilterStation, FilterRequest } from "../model/filterStation.js";
 
 const router = express.Router();
 
@@ -134,6 +134,40 @@ router.patch(
       else {
         statusCode = 500;
       }
+    }
+    res.status(statusCode).json(responseJson);
+  }
+);
+
+router.get(
+  "/:userId/requests",
+  [authSelf, validatorStatus, validatorDate],
+  async function (req, res, next) {
+    const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 0;
+    const page = req.query.page ? parseInt(req.query.page) : 0;
+    const queryName = req.query.name;
+    const querySerialNumber = req.query.serialNumber;
+    const queryStatus = req.query.status;
+    const queryDate = req.query.date;
+    const userId = req.params.userId;
+
+    let responseJson = "";
+    let statusCode = 200;
+
+    const filterRequest = new FilterRequest(
+      pageSize,
+      page,
+      queryName,
+      querySerialNumber,
+      queryStatus,
+      queryDate,
+      userId
+    );
+
+    try {
+      responseJson = await getRequests(filterRequest);
+    } catch (error) {
+      responseJson = { message: error.message };
     }
     res.status(statusCode).json(responseJson);
   }

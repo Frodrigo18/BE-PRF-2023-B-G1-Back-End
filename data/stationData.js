@@ -53,6 +53,7 @@ async function update(id, station) {
 }
 
 async function findAll(filterStation) {
+  
   const filter = {};
 
   if (filterStation.name) {
