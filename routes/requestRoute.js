@@ -34,6 +34,7 @@ router.get(
     try {
       responseJson = await get(filterRequests);
     } catch (error) {
+      statusCode = 500;
       responseJson = { message: error.message };
     }
     res.status(statusCode).json(responseJson);
