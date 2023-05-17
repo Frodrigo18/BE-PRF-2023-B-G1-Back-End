@@ -1,4 +1,4 @@
-import { create, findById, findAll, approve as approvedRequest, reject as rejectRequest, findBySerialNumber } from "../data/requestData.js";
+import { create, findById, findAll, approve as approveRequest, reject as rejectRequest, findBySerialNumber } from "../data/requestData.js";
 import { exists as existsStation, add as addStation } from "./stationService.js";
 import { StationAlreadyExistsError } from "./error/stationAlreadyExistsError.js";
 import { RequestStatus } from "../model/enum/requestStatus.js";
@@ -45,11 +45,11 @@ async function get(filterRequests) {
   return request;  
 }
 
-async function accept(requestId, user, userAdminId){
+async function approve(requestId, user, userAdminId){
   console.log(`INFO: Accepting request for User Id ${user.id}`)
   const request = await _find(requestId, user.id);
   await createAwsIoT(request);
-  const updatedRequest = await _updateStatus(approvedRequest, user.id, requestId, userAdminId, RequestStatus.APPROVED);
+  const updatedRequest = await _updateStatus(approveRequest, user.id, requestId, userAdminId, RequestStatus.APPROVED);
   await addStation(request, user.id);
   sendRequestMail(user.mail, user.user_name, RequestStatus.APPROVED, null, updatedRequest);
   return updatedRequest;
@@ -88,4 +88,4 @@ async function _find(requestId, userId){
   }
 }
 
-export { add , get, accept, reject};
+export { add , get, approve, reject};
