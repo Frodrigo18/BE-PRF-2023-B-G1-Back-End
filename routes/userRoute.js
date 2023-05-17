@@ -3,7 +3,7 @@ import { auth, authAdmin, authSelf } from "../middleware/auth/auth.js";
 import { addRequestValidator } from "../middleware/validator/body/addRequestValidator.js";
 import { rejectRequestValidator } from "../middleware/validator/body/rejectRequestValidator.js";
 import { UserNotFoundError } from "../service/error/userNotFoundError.js";
-import { add, accept, reject, getByUser as getRequests } from "../controller/requestController.js";
+import { add, approve, reject, getByUser as getRequests } from "../controller/requestController.js";
 import { StationAlreadyExistsError } from "../service/error/stationAlreadyExistsError.js";
 import { UserUnexpectedError } from "../service/error/userUnexpectedError.js";
 import { RequestNotFoundError } from "../service/error/requestNotFoundError.js";
@@ -53,7 +53,7 @@ router.post(
   }
 );
 
-router.patch("/:userId/requests/:requestId/accept", [authAdmin], async function (req, res, next){
+router.patch("/:userId/requests/:requestId/approve", [authAdmin], async function (req, res, next){
   let responseJson = ""
   let statusCode = 200
 
@@ -61,7 +61,7 @@ router.patch("/:userId/requests/:requestId/accept", [authAdmin], async function 
     const userId = req.params.userId;
     const requestId = req.params.requestId
     const userToken = req.header("Authorization");
-    responseJson = await accept(userId, req.adminId, requestId, userToken)
+    responseJson = await approve(userId, req.adminId, requestId, userToken)
   }catch (error){
     responseJson = {message: error.message}
     if (error instanceof UserNotFoundError || error instanceof RequestNotFoundError){

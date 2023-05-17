@@ -179,10 +179,172 @@ paths:
                     type: string
                     description: Error message
                     example: "Internal Server Error"
-  /users/{userId}/requests:
+  /api/v1/users/{userId}/requests:
+    get:
+      summary: Get user requests
+      description: Retrieve requests for a specific user
+      security:
+        - bearerAuth: []
+      tags:
+        - Requests
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Access token for authentication.
+        - name: pageSize
+          in: query
+          description: Number of requests to return per page
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: Page number of requests to retrieve
+          schema:
+            type: integer
+        - name: name
+          in: query
+          description: Filter requests by name
+          schema:
+            type: string
+        - name: serialNumber
+          in: query
+          description: Filter requests by serial number
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Filter requests by status
+          schema:
+            type: string
+        - name: date
+          in: query
+          description: Filter requests by date
+          schema:
+            type: string
+      responses:
+        200:
+          description: The created request.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      description: Unique identifier of the request.
+                      example: "64612f41b0a9b6ebef6a0e66"
+                    serial_number:
+                      type: string
+                      description: Serial number of the station.
+                      example: "8edsf23489"
+                    name:
+                      type: string
+                      description: Name of the station.
+                      example: "Air-Quality-Station"
+                    longitude:
+                      type: number
+                      format: float
+                      description: Longitude of the station's location.
+                      example: -159.6969448413211
+                    latitude:
+                      type: number
+                      format: float
+                      description: Latitude of the station's location.
+                      example: 21.371452961552126
+                    brand:
+                      type: string
+                      description: Brand of the station.
+                      example: Huawei
+                    model:
+                      type: string
+                      description: Model of the station.
+                      example: L17GYT-G
+                    status:
+                      type: string
+                      enum:
+                        - PENDING
+                        - APPROVED
+                        - REJECTED
+                      description: Status of the request.
+                    created_by:
+                      type: integer
+                      description: Identifier of the user who created the request.
+                      example: 2
+                    created_at:
+                      type: string
+                      format: date-time
+                      description: Date and time when the request was created.
+                    approved_by:
+                      type: integer
+                      nullable: true
+                      description: Identifier of the user who approved the request.
+                      example: 1
+                    approved_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+                      description: Date and time when the request was approved.
+        401:
+          description: Unauthenticated Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Unauthenticated"
+        403:
+          description: Forbbiden Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Forbbiden"
+        404:
+          description: Not Found Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Not Found"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Forbbiden"
+
     post:
       summary: Create a request for a user.
       description: Creates a new request for the specified user.
+      security:
+        - bearerAuth: []
       tags:
         - Requests
       parameters:
@@ -363,6 +525,8 @@ paths:
   /api/v1/stations:
     get:
       summary: Obtains stations.
+      security:
+        - bearerAuth: []
       description: Obtains stations according to parameters.
       tags:
         - Stations
@@ -448,9 +612,8 @@ paths:
                     status:
                       type: string
                       enum:
-                        - PENDING
-                        - APPROVED
-                        - REJECTED
+                        - ACTIVE
+                        - INACTIVE
                       description: Status of the request.
                     created_by:
                       type: integer
@@ -471,6 +634,17 @@ paths:
                     type: string
                     description: Error message
                     example: "Unathorized"
+        403:
+          description: Forbbiden Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Forbbiden"
         500:
           description: Internal Server Error
           content:
@@ -482,9 +656,11 @@ paths:
                     type: string
                     description: Error message
                     example: "Internal Server Error"
-  /users/{userId}/requests/{requestId}/accept:
+  /api/v1/users/{userId}/requests/{requestId}/approve:
     patch:
       summary: Accept a request.
+      security:
+        - bearerAuth: []
       description: Accepts the specified request for the user.
       tags:
         - Requests
@@ -548,9 +724,7 @@ paths:
                   status:
                     type: string
                     enum:
-                      - PENDING
                       - APPROVED
-                      - REJECTED
                     description: Status of the request.
                   created_by:
                     type: integer
@@ -571,12 +745,621 @@ paths:
                     nullable: true
                     description: Date and time when the request was approved.
         401:
-          description: Unauthorized.
+          description: Unauthorized Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Unathorized"
+        403:
+          description: Forbbiden Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Forbbiden"
         404:
-          description: User or request not found.
+          description: Not Found Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Not Found"
         409:
-          description: Request has an invalid status or station already exists.
+          description: Conflict Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Conflict"
         500:
-          description: Internal server error.
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Internal Server ERROR"
+
+  /api/v1/users/{userId}/requests/{requestId}/reject:
+    patch:
+      summary: Reject request
+      security:
+        - bearerAuth: []
+      description: Reject a specific request
+      tags:
+        - Requests
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user
+          required: true
+          schema:
+            type: string
+        - name: requestId
+          in: path
+          description: ID of the request
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Access token for authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  example: "Unsupported brand"
+      responses:
+        '200':
+          description: The created request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    description: Unique identifier of the request.
+                    example: "64612f41b0a9b6ebef6a0e66"
+                  serial_number:
+                    type: string
+                    description: Serial number of the station.
+                    example: "8edsf23489"
+                  name:
+                    type: string
+                    description: Name of the station.
+                    example: "Air-Quality-Station"
+                  longitude:
+                    type: number
+                    format: float
+                    description: Longitude of the station's location.
+                    example: -159.6969448413211
+                  latitude:
+                    type: number
+                    format: float
+                    description: Latitude of the station's location.
+                    example: 21.371452961552126
+                  brand:
+                    type: string
+                    description: Brand of the station.
+                    example: Huawei
+                  model:
+                    type: string
+                    description: Model of the station.
+                    example: L17GYT-G
+                  status:
+                    type: string
+                    enum:
+                      - REJECTED
+                    description: Status of the request.
+                  created_by:
+                    type: integer
+                    description: Identifier of the user who created the request.
+                    example: 2
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: Date and time when the request was created.
+                  approved_by:
+                    type: integer
+                    nullable: true
+                    description: Identifier of the user who approved the request.
+                    example: 1
+                  approved_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                    description: Date and time when the request was approved.
+        400:
+          description: Bad Request Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Bad Request"
+        401:
+          description: Unauthorized Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Unathorized"
+        403:
+          description: Forbidden Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Forbidden"
+        '404':
+          description: Not Found Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Not Found"
+        '409':
+          description: Conflict Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Conflict"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Internal Server Error"
+  /api/v1/users/{userId}/stations:
+    get:
+      summary: Get user stations
+      security:
+        - bearerAuth: []
+      tags:
+        - Stations
+      description: Retrieve stations for a specific user
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Access token for authentication.
+        - name: pageSize
+          in: query
+          description: Number of stations to return per page
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: Page number of stations to retrieve
+          schema:
+            type: integer
+        - name: name
+          in: query
+          description: Filter stations by name
+          schema:
+            type: string
+        - name: serialNumber
+          in: query
+          description: Filter stations by serial number
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Filter stations by status
+          schema:
+            type: string
+        - name: date
+          in: query
+          description: Filter stations by date
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of stations with optional pagination.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      description: Unique identifier of the request.
+                      example: "64612f41b0a9b6ebef6a0e66"
+                    serial_number:
+                      type: string
+                      description: Serial number of the station.
+                      example: "8edsf23489"
+                    name:
+                      type: string
+                      description: Name of the station.
+                      example: "Air-Quality-Station"
+                    longitude:
+                      type: number
+                      format: float
+                      description: Longitude of the station's location.
+                      example: -159.6969448413211
+                    latitude:
+                      type: number
+                      format: float
+                      description: Latitude of the station's location.
+                      example: 21.371452961552126
+                    brand:
+                      type: string
+                      description: Brand of the station.
+                      example: Huawei
+                    model:
+                      type: string
+                      description: Model of the station.
+                      example: L17GYT-G
+                    status:
+                      type: string
+                      enum:
+                        - ACTIVE
+                      description: Status of the request.
+                    created_by:
+                      type: integer
+                      description: Identifier of the user who created the request.
+                      example: 2
+                    created_at:
+                      type: string
+                      format: date-time
+                      description: Date and time when the request was created.
+        '401':
+          description: Unauthenticated Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Unauthenticated"
+        '403':
+          description: Forbidden Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Forbidden"
+        404:
+          description: Not Found Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Not Found"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Internal Server Error"
+
+  /api/v1/users/{userId}/stations/{stationId}/suspend:
+    patch:
+      summary: Suspend station
+      security:
+        - bearerAuth: []
+      description: Suspend a specific station
+      tags:
+        - Stations
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user
+          required: true
+          schema:
+            type: string
+        - name: stationId
+          in: path
+          description: ID of the station
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Access token for authentication.
+      requestBody:
+        required: false
+      responses:
+        '200':
+          description: A list of stations with optional pagination.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    description: Unique identifier of the request.
+                    example: "64612f41b0a9b6ebef6a0e66"
+                  serial_number:
+                    type: string
+                    description: Serial number of the station.
+                    example: "8edsf23489"
+                  name:
+                    type: string
+                    description: Name of the station.
+                    example: "Air-Quality-Station"
+                  longitude:
+                    type: number
+                    format: float
+                    description: Longitude of the station's location.
+                    example: -159.6969448413211
+                  latitude:
+                    type: number
+                    format: float
+                    description: Latitude of the station's location.
+                    example: 21.371452961552126
+                  brand:
+                    type: string
+                    description: Brand of the station.
+                    example: Huawei
+                  model:
+                    type: string
+                    description: Model of the station.
+                    example: L17GYT-G
+                  status:
+                    type: string
+                    enum:
+                      - INACTIVE
+                    description: Status of the request.
+                  created_by:
+                    type: integer
+                    description: Identifier of the user who created the request.
+                    example: 2
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: Date and time when the request was created.
+        401:
+          description: Unauthenticated Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Unauthenticated"
+        403:
+          description: Forbidden Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Forbidden"
+        '404':
+          description: Not Found Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Not Found"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Internal Server Error"
+
+  /api/v1/users/{userId}/stations/{stationId}/rename:
+    patch:
+      summary: Rename station
+      security:
+        - bearerAuth: []
+      description: Rename a specific station
+      tags:
+        - Stations
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user
+          required: true
+          schema:
+            type: string
+        - name: stationId
+          in: path
+          description: ID of the station
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Access token for authentication.
+      responses:
+        '200':
+          description: A list of stations with optional pagination.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    description: Unique identifier of the request.
+                    example: "64612f41b0a9b6ebef6a0e66"
+                  serial_number:
+                    type: string
+                    description: Serial number of the station.
+                    example: "8edsf23489"
+                  name:
+                    type: string
+                    description: Name of the station.
+                    example: "Air-Quality-Station"
+                  longitude:
+                    type: number
+                    format: float
+                    description: Longitude of the station's location.
+                    example: -159.6969448413211
+                  latitude:
+                    type: number
+                    format: float
+                    description: Latitude of the station's location.
+                    example: 21.371452961552126
+                  brand:
+                    type: string
+                    description: Brand of the station.
+                    example: Huawei
+                  model:
+                    type: string
+                    description: Model of the station.
+                    example: L17GYT-G
+                  status:
+                    type: string
+                    enum:
+                      - ACTIVE
+                    description: Status of the request.
+                  created_by:
+                    type: integer
+                    description: Identifier of the user who created the request.
+                    example: 2
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: Date and time when the request was created.
+        '401':
+          description: Unauthorized Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Unauthorized Error"
+        '403':
+          description: Forbidden Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Forbidden Error"
+        '404':
+          description: Not Found Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Not Found"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Internal Server Error"
+
 
 
