@@ -4,9 +4,9 @@ import { get as getRequests } from "../service/requestService.js";
 
 async function add(body, userid, userToken) {
   console.log(`INFO: Starting add request by User Id ${userid}`)
-  await findUser(userid, userToken);
+  const user = await findUser(userid, userToken);
 
-  const request = await addRequest(body, userid);
+  const request = await addRequest(user, body);
   console.log(`INFO: Add request by User Id ${userid} finished successfully`)
   return request;
 }

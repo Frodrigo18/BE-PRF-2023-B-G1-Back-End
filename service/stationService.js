@@ -17,7 +17,7 @@ async function exists(serialNumber) {
   return station != null && station.status != StationStatus.INACTIVE;
 }
 
-async function add(request, userId) {
+async function add(request, user) {
   console.log(`INFO: Adding station serial number ${request.serial_number}`)
   const station = await findBySerialNumber(request.serial_number);
 
@@ -26,12 +26,17 @@ async function add(request, userId) {
       serial_number: request.serial_number,
       name: request.name,
       longitude: request.longitude,
-      latitud: request.latitude,
+      latitude: request.latitude,
       brand: request.brand,
       model: request.model,
       status: StationStatus.ACTIVE,
-      created_by: parseInt(userId),
+      created_by: parseInt(user.id),
       created_at: new Date(),
+      user:  {
+        id: user.id,
+        user_name: user.user_name,
+        mail: user.mail
+      }
     };
   
     const newStation = await create(fullStation);

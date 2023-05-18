@@ -1,5 +1,5 @@
 import express from "express";
-import { auth, authAdmin, authSelf } from "../middleware/auth/auth.js";
+import { auth, authAdmin, authSelf, authOnlySelf } from "../middleware/auth/auth.js";
 import { addRequestValidator } from "../middleware/validator/body/addRequestValidator.js";
 import { rejectRequestValidator } from "../middleware/validator/body/rejectRequestValidator.js";
 import { UserNotFoundError } from "../service/error/userNotFoundError.js";
@@ -23,7 +23,7 @@ const router = express.Router();
 
 router.post(
   "/:userId/requests",
-  [auth, authSelf, addRequestValidator],
+  [auth, authOnlySelf, addRequestValidator],
   async function (req, res, next) {
     let responseJson = "";
     let statusCode = 201;

@@ -21,6 +21,21 @@ function authAdmin(req, res, next) {
   }
 }
 
+function authOnlySelf(req, res, next){
+  try{
+    let token = req.header("Authorization");
+    const user = jwt.verify(token, process.env.SECRETPASS);
+    if (user.id == req.params.userId){
+      next()
+    }
+    else{
+      res.status(403).send({ error: "Invalid User Priviledge" });
+    }
+  } catch(error){
+    res.status(401).send({ error: error.message });
+  }
+}
+
 function authSelf(req, res, next){
   try{
     let token = req.header("Authorization");
@@ -63,4 +78,4 @@ function auth(req, res, next) {
 }
 
 
-export  {authAdmin, authUser, authSelf, auth};
+export { authAdmin, authUser, authSelf, auth, authOnlySelf };
