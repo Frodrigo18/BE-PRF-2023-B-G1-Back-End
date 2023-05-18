@@ -7,8 +7,8 @@ import { RequestInvalidStatusError } from "./error/requestInvalidStatusError.js"
 import { sendRequestMail } from "./mailService.js";
 import { createAwsIoT } from "./awsService.js";
 
-async function add(request, userid) {
-  console.log(`INFO: Adding request by User Id ${userid}`)
+async function add(user, request) {
+  console.log(`INFO: Adding request by User Id ${user.id}`)
   if (!(await existsStation(request.serial_number)) && !(await _exist(request.serial_number))) {
     const fullRequest = {
       serial_number: request.serial_number,
@@ -18,10 +18,15 @@ async function add(request, userid) {
       brand: request.brand,
       model: request.model,
       status: RequestStatus.PENDING,
-      created_by: parseInt(userid),
+      created_by: parseInt(user.id),
       created_at: new Date(),
       approved_by: null,
-      approved_at: null
+      approved_at: null,
+      user:  {
+        id: user.id,
+        user_name: user.user_name,
+        mail: user.mail
+      }
     }
     const newRequest = await create(fullRequest);
     return await findById(newRequest.insertedId)
@@ -50,7 +55,7 @@ async function approve(requestId, user, userAdminId){
   const request = await _find(requestId, user.id);
   await createAwsIoT(request);
   const updatedRequest = await _updateStatus(approveRequest, user.id, requestId, userAdminId, RequestStatus.APPROVED);
-  await addStation(request, user.id);
+  await addStation(request, user);
   sendRequestMail(user.mail, user.user_name, RequestStatus.APPROVED, null, updatedRequest);
   return updatedRequest;
 }
