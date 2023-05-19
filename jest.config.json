@@ -1,0 +1,18 @@
+{
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    },
+    "testMatch": [
+      "**/test/**/*.test.js"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "data/connection/conn.js"
+    ],
+    "testEnvironment": "node",
+    "collectCoverage": true,
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "src/**/*.js"
+  ]
+}

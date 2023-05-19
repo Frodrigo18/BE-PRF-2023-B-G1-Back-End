@@ -9,7 +9,7 @@ import { createAwsIoT } from "./awsService.js";
 
 async function add(user, request) {
   console.log(`INFO: Adding request by User Id ${user.id}`)
-  if (!(await existsStation(request.serial_number)) && !(await _exist(request.serial_number))) {
+  if (!(await existsStation(request.serial_number)) && !(await exists(request.serial_number))) {
     const fullRequest = {
       serial_number: request.serial_number,
       name: request.name,
@@ -39,7 +39,7 @@ async function add(user, request) {
   }
 }
 
-async function _exist(serialNumber){
+async function exists(serialNumber){
   const request = await findBySerialNumber(serialNumber);
   return (request != null && request.some(r => r.status == RequestStatus.PENDING))
 }
@@ -93,4 +93,4 @@ async function _find(requestId, userId){
   }
 }
 
-export { add , get, approve, reject};
+export { add , get, approve, reject, existsStation, exists };
