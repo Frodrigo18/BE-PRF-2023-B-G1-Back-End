@@ -146,6 +146,21 @@ paths:
                       format: date-time
                       nullable: true
                       description: Date and time when the request was approved.
+                    user:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: Identifier of the user.
+                          example: 2
+                        user_name:
+                          type: string
+                          description: Username of the user.
+                          example: johndoe
+                        mail:
+                          type: string
+                          description: Email of the user.
+                          example: ezequielhoyos11@gmail.com
         401:
           description: Unauthorized Error
           content:
@@ -295,6 +310,21 @@ paths:
                       format: date-time
                       nullable: true
                       description: Date and time when the request was approved.
+                    user:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: Identifier of the user.
+                          example: 2
+                        user_name:
+                          type: string
+                          description: Username of the user.
+                          example: johndoe
+                        mail:
+                          type: string
+                          description: Email of the user.
+                          example: ezequielhoyos11@gmail.com
         401:
           description: Unauthenticated Error
           content:
@@ -456,6 +486,21 @@ paths:
                     format: date-time
                     nullable: true
                     description: Date and time when the request was approved.
+                  user:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: Identifier of the user.
+                          example: 2
+                        user_name:
+                          type: string
+                          description: Username of the user.
+                          example: johndoe
+                        mail:
+                          type: string
+                          description: Email of the user.
+                          example: ezequielhoyos11@gmail.com
         400:
           description: Unauthorized Error
           content:
@@ -623,6 +668,21 @@ paths:
                       type: string
                       format: date-time
                       description: Date and time when the request was created.
+                    user:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: Identifier of the user.
+                          example: 2
+                        user_name:
+                          type: string
+                          description: Username of the user.
+                          example: johndoe
+                        mail:
+                          type: string
+                          description: Email of the user.
+                          example: ezequielhoyos11@gmail.com
         401:
           description: Unauthorized Error
           content:
@@ -744,6 +804,21 @@ paths:
                     format: date-time
                     nullable: true
                     description: Date and time when the request was approved.
+                  user:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: Identifier of the user.
+                          example: 2
+                        user_name:
+                          type: string
+                          description: Username of the user.
+                          example: johndoe
+                        mail:
+                          type: string
+                          description: Email of the user.
+                          example: ezequielhoyos11@gmail.com
         401:
           description: Unauthorized Error
           content:
@@ -898,6 +973,21 @@ paths:
                     format: date-time
                     nullable: true
                     description: Date and time when the request was approved.
+                  user:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: Identifier of the user.
+                          example: 2
+                        user_name:
+                          type: string
+                          description: Username of the user.
+                          example: johndoe
+                        mail:
+                          type: string
+                          description: Email of the user.
+                          example: ezequielhoyos11@gmail.com
         400:
           description: Bad Request Error
           content:
@@ -1068,6 +1158,21 @@ paths:
                       type: string
                       format: date-time
                       description: Date and time when the request was created.
+                    user:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: Identifier of the user.
+                          example: 2
+                        user_name:
+                          type: string
+                          description: Username of the user.
+                          example: johndoe
+                        mail:
+                          type: string
+                          description: Email of the user.
+                          example: ezequielhoyos11@gmail.com
         '401':
           description: Unauthenticated Error
           content:
@@ -1193,6 +1298,21 @@ paths:
                     type: string
                     format: date-time
                     description: Date and time when the request was created.
+                  user:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: Identifier of the user.
+                          example: 2
+                        user_name:
+                          type: string
+                          description: Username of the user.
+                          example: johndoe
+                        mail:
+                          type: string
+                          description: Email of the user.
+                          example: ezequielhoyos11@gmail.com
         401:
           description: Unauthenticated Error
           content:
@@ -1316,6 +1436,21 @@ paths:
                     type: string
                     format: date-time
                     description: Date and time when the request was created.
+                  user:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: Identifier of the user.
+                          example: 2
+                        user_name:
+                          type: string
+                          description: Username of the user.
+                          example: johndoe
+                        mail:
+                          type: string
+                          description: Email of the user.
+                          example: ezequielhoyos11@gmail.com
         '401':
           description: Unauthorized Error
           content:
